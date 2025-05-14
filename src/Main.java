@@ -1,7 +1,13 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.event.MenuDragMouseEvent;
+import javax.swing.event.MenuDragMouseListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ImageObserver;
+import java.text.AttributedCharacterIterator;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,34 +19,32 @@ public class Main {
         frame.setSize(900, 600);
         setComponents(frame);
         frame.setVisible(true);
-    }
-    public static void setComponents(Frame frame) {
-        //frame.setBackground(Color.DARK_GRAY);
-        // does not seem to work
         BorderLayout layout = new BorderLayout();
         frame.setLayout(layout);
-        JLabel labelName = new JLabel("WTF - Format");
-        frame.add(labelName);
-        setLoadImage(frame);
-
     }
-    public static void setLoadImage(Frame frame) {
-        JButton loadImage = new JButton();
-        loadImage.setText("Load Image");
-        loadImage.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.remove(loadImage);
-                setLoadImage(frame);
-
-            }
-        });
-        frame.add(loadImage, BorderLayout.NORTH);
+    public static void setComponents(JFrame frame) {
+        MainPanel mainPanel = new MainPanel(frame);
+        frame.add(mainPanel);
+        PanelNorth panelNorth = setPanel(frame, mainPanel);
+        mainPanel.add(panelNorth.viewerMenuBar, BorderLayout.NORTH);
+        setMenuBar(frame, mainPanel, panelNorth);
     }
-    public static void setLoadImageOptions(Frame frame) {
-        JButton getImageByPath = new JButton("by path");
-        frame.add(getImageByPath, BorderLayout.NORTH);
-        JButton createNewImage = new JButton("create new image");
-        //frame.add(createNewImage, BorderLayout.);
+    public static void setMenuBar(JFrame frame, JPanel panel, PanelNorth panelNorth) {
+        JMenuBar primaryMenu = new JMenuBar();
+        primaryMenu.setLayout(new FlowLayout());
+        primaryMenu.setBackground(Colors.background);
+        LoadImage loadImage = new LoadImage(primaryMenu, panel);
+
+        EditViewButton editViewButton = new EditViewButton(primaryMenu, panel, panelNorth);
+
+        primaryMenu.add(editViewButton.getViewer());
+        primaryMenu.add(editViewButton.getEditor());
+        frame.setJMenuBar(primaryMenu);
+    }
+    public static PanelNorth setPanel(JFrame frame, JPanel panel) {
+        panel.setLayout(new BorderLayout());
+        PanelNorth panelNorth = new PanelNorth();
+        frame.add(panel);
+        return panelNorth;
     }
 }
