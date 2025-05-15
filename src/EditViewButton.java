@@ -22,14 +22,14 @@ public class EditViewButton {
         ImageIcon viewIcon = new ImageIcon(Main.class.getResource("/icons/view.png"));
         Image viewIconImage = viewIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         viewer.setIcon(new ImageIcon(viewIconImage));
-        viewer.setBackground(Colors.itemsMain);
+        viewer.setBackground(Colors.ITEMSPRIMARY);
         viewer.setVisible(false);
         viewer.setHorizontalTextPosition(SwingConstants.RIGHT);
         viewer.setVerticalTextPosition(SwingConstants.CENTER);
 
-        viewer.setPreferredSize(Size.buttonSizeMainMenu);
-        viewer.setMaximumSize(Size.buttonSizeMainMenu);
-        viewer.setMinimumSize(Size.buttonSizeMainMenu);
+        viewer.setPreferredSize(Size.BUTTONSIZEMAINMENU);
+        viewer.setMaximumSize(Size.BUTTONSIZEMAINMENU);
+        viewer.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         menuBar.add(viewer);
         viewer.addActionListener(new ActionListener() {
             @Override
@@ -66,15 +66,15 @@ public class EditViewButton {
         ImageIcon editorIcon = new ImageIcon(Main.class.getResource("/icons/editor.png"));
         Image editorIconImage = editorIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         editor.setIcon(new ImageIcon(editorIconImage));
-        editor.setBackground(Colors.itemsMain);
+        editor.setBackground(Colors.ITEMSPRIMARY);
         editor.setVisible(true);
 
         editor.setHorizontalTextPosition(SwingConstants.RIGHT);
         editor.setVerticalTextPosition(SwingConstants.CENTER);
 
-        editor.setPreferredSize(Size.buttonSizeMainMenu);
-        editor.setMaximumSize(Size.buttonSizeMainMenu);
-        editor.setMinimumSize(Size.buttonSizeMainMenu);
+        editor.setPreferredSize(Size.BUTTONSIZEMAINMENU);
+        editor.setMaximumSize(Size.BUTTONSIZEMAINMENU);
+        editor.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         editor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

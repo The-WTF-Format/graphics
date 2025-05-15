@@ -23,9 +23,9 @@ public class LoadImage {
     }
     private void addMenu() {
         loadImage = new JMenu("Load image");
-        loadImage.setPreferredSize(Size.buttonSizeMainMenu);
-        loadImage.setMinimumSize(Size.buttonSizeMainMenu);
-        loadImage.setMaximumSize(Size.buttonSizeMainMenu);
+        loadImage.setPreferredSize(Size.BUTTONSIZEMAINMENU);
+        loadImage.setMinimumSize(Size.BUTTONSIZEMAINMENU);
+        loadImage.setMaximumSize(Size.BUTTONSIZEMAINMENU);
         menu.add(loadImage);
         addMenuItems();
     }
@@ -36,7 +36,7 @@ public class LoadImage {
     private void addCreateItem() {
         JMenuItem createNewImage = new JMenuItem("create new image");
         loadImage.add(createNewImage);
-        createNewImage.setBackground(Colors.itemsMain);
+        createNewImage.setBackground(Colors.ITEMSPRIMARY);
         createNewImage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,7 +67,7 @@ public class LoadImage {
     private void addPathItem() {
         JMenuItem byPath = new JMenuItem("by path");
         loadImage.add(byPath);
-        byPath.setBackground(Colors.itemsMain);
+        byPath.setBackground(Colors.ITEMSPRIMARY);
         byPath.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -123,10 +123,10 @@ public class LoadImage {
     }
     private void saveImage() {
         JButton saveButton = new JButton("save Image");
-        saveButton.setPreferredSize(Size.buttonSizeMainMenu);
-        saveButton.setMinimumSize(Size.buttonSizeMainMenu);
-        saveButton.setMaximumSize(Size.buttonSizeMainMenu);
-        saveButton.setBackground(Colors.itemsMain);
+        saveButton.setPreferredSize(Size.BUTTONSIZEMAINMENU);
+        saveButton.setMinimumSize(Size.BUTTONSIZEMAINMENU);
+        saveButton.setMaximumSize(Size.BUTTONSIZEMAINMENU);
+        saveButton.setBackground(Colors.ITEMSPRIMARY);
         panel.add(saveButton, BorderLayout.SOUTH);
         saveButton.addActionListener(new ActionListener() {
             @Override
@@ -136,6 +136,7 @@ public class LoadImage {
         });
     }
     private void createNewImage() {
+        //todo in getrennte KLasse auslagern
         createImage = new JPanel();
         createImage.setLayout(new BoxLayout(createImage, BoxLayout.X_AXIS));
         panel.add(createImage, BorderLayout.CENTER);
@@ -143,7 +144,7 @@ public class LoadImage {
         //0.
         JLabel label = new JLabel("Please enter all attributes:");
         createImage.add(label);
-        createImage.add(Box.createHorizontalStrut(150));
+        createImage.add(Box.createHorizontalStrut(100));
         //1.
         JSpinner width = new JSpinner(new SpinnerNumberModel(1, 1, 65535, 1));
         width.setPreferredSize(new Dimension(200, 200));
@@ -151,13 +152,25 @@ public class LoadImage {
         width.setMinimumSize(new Dimension(200, 200));
         width.setName("Width");
         createImage.add(width);
-        createImage.add(Box.createHorizontalStrut(150));
+        createImage.add(Box.createHorizontalStrut(100));
         //2.
-        JButton accept = new JButton("accept");
-        createImage.add(accept);
+        JButton next = new JButton("next");
+        createImage.add(next);
+        createImage.add(Box.createHorizontalStrut(100));
+        JButton cancel = new JButton("cancel");
+        createImage.add(cancel);
         createImage.add(Box.createHorizontalStrut(50));
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.remove(createImage);
+                panel.revalidate();
+                panel.repaint();
+            }
+        });
+
         // todo usw.
-        // todo konzept wie Attributes "abarbeiten" fehlt
+        // todo Konzept wie Attributes "abarbeiten" fehlt
     }
 
 }

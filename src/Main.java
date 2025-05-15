@@ -32,7 +32,7 @@ public class Main {
     public static void setMenuBar(JFrame frame, JPanel panel, PanelNorth panelNorth) {
         JMenuBar primaryMenu = new JMenuBar();
         primaryMenu.setLayout(new FlowLayout());
-        primaryMenu.setBackground(Colors.background);
+        primaryMenu.setBackground(Colors.BACKGROUND);
         LoadImage loadImage = new LoadImage(primaryMenu, panel);
 
         EditViewButton editViewButton = new EditViewButton(primaryMenu, panel, panelNorth);

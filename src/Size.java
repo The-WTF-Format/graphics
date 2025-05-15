@@ -1,7 +1,10 @@
 import java.awt.*;
 
-public record Size() {
-    static Dimension buttonSizeMainMenu = new Dimension(170, 30);
-    static Dimension buttonSizeSecondaryMenu = new Dimension(120, 23);
-    static Dimension secondaryMenuBar = new Dimension(900, 35);
+public final class Size {
+    public static final Dimension BUTTONSIZEMAINMENU = new Dimension(170, 30);
+    public static final Dimension BUTTONSIZESECONDARYMENU = new Dimension(120, 23);
+    public static final Dimension SECONDARYMENUBAR = new Dimension(900, 35);
+    private Size() {
+
+    }
 }
