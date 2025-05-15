@@ -16,6 +16,8 @@ public class LoadImage {
     ImagePanel imagePanel;
     BufferedImage image;
     JTextField text = new JTextField();
+    JMenuItem createNewImage;
+    JMenuItem byPath;
     LoadImage(JMenuBar menu, JPanel panel) {
         this.menu = menu;
         this.panel = panel;
@@ -34,7 +36,7 @@ public class LoadImage {
         addCreateItem();
     }
     private void addCreateItem() {
-        JMenuItem createNewImage = new JMenuItem("create new image");
+        createNewImage = new JMenuItem("create new image");
         loadImage.add(createNewImage);
         createNewImage.setBackground(Colors.ITEMSPRIMARY);
         createNewImage.addActionListener(new ActionListener() {
@@ -57,6 +59,7 @@ public class LoadImage {
                 */
                 //probeweise ohne WtfImageBuilder parameter
                 //-----
+                byPath.setVisible(false);
                 createNewImage();
                 saveImage();
                 panel.revalidate();
@@ -65,7 +68,7 @@ public class LoadImage {
         });
     }
     private void addPathItem() {
-        JMenuItem byPath = new JMenuItem("by path");
+        byPath = new JMenuItem("by path");
         loadImage.add(byPath);
         byPath.setBackground(Colors.ITEMSPRIMARY);
         byPath.addActionListener(new ActionListener() {
@@ -164,6 +167,7 @@ public class LoadImage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.remove(createImage);
+                byPath.setVisible(true);
                 panel.revalidate();
                 panel.repaint();
             }
