@@ -7,6 +7,7 @@ public class ImagePanel extends JPanel {
     private final BufferedImage image;
     public ImagePanel(BufferedImage image) {
      this.image = image;
+     this.setBackground(Colors.BACKGROUND);
     }
     @Override
     protected void paintComponent(Graphics g) {

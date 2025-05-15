@@ -11,14 +11,14 @@ import java.nio.file.Path;
 public class LoadImage {
     JMenuBar menu;
     JMenu loadImage;
-    JPanel panel;
-    JPanel createImage;
+    CreatePanel panel;
+    CreatePanel createImage;
     ImagePanel imagePanel;
     BufferedImage image;
     JTextField text = new JTextField();
     JMenuItem createNewImage;
     JMenuItem byPath;
-    LoadImage(JMenuBar menu, JPanel panel) {
+    LoadImage(JMenuBar menu, CreatePanel panel) {
         this.menu = menu;
         this.panel = panel;
         addMenu();
@@ -60,6 +60,7 @@ public class LoadImage {
                 //probeweise ohne WtfImageBuilder parameter
                 //-----
                 byPath.setVisible(false);
+                createNewImage.setVisible(false);
                 createNewImage();
                 saveImage();
                 panel.revalidate();
@@ -140,7 +141,7 @@ public class LoadImage {
     }
     private void createNewImage() {
         //todo in getrennte KLasse auslagern
-        createImage = new JPanel();
+        createImage = new CreatePanel();
         createImage.setLayout(new BoxLayout(createImage, BoxLayout.X_AXIS));
         panel.add(createImage, BorderLayout.CENTER);
         createImage.add(Box.createHorizontalStrut(50));
@@ -168,6 +169,7 @@ public class LoadImage {
             public void actionPerformed(ActionEvent e) {
                 panel.remove(createImage);
                 byPath.setVisible(true);
+                createNewImage.setVisible(true);
                 panel.revalidate();
                 panel.repaint();
             }

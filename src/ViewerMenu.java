@@ -9,7 +9,7 @@ public class ViewerMenu extends MenuBar{
     private void addMenu() {
         menuBar = new JMenuBar();
         menuBar.setLayout(new FlowLayout());
-        menuBar.setBackground(Colors.BACKGROUND);
+        menuBar.setBackground(Colors.MENUBARBACKGROUND);
         menuBar.setPreferredSize(Size.SECONDARYMENUBAR);
         menuBar.setMinimumSize(Size.SECONDARYMENUBAR);
         menuBar.setMaximumSize(Size.SECONDARYMENUBAR);

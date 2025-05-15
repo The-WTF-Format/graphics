@@ -23,16 +23,16 @@ public class Main {
         frame.setLayout(layout);
     }
     public static void setComponents(JFrame frame) {
-        MainPanel mainPanel = new MainPanel(frame);
+        CreatePanel mainPanel = new CreatePanel();
         frame.add(mainPanel);
         PanelNorth panelNorth = setPanel(frame, mainPanel);
         mainPanel.add(panelNorth.viewerMenuBar, BorderLayout.NORTH);
         setMenuBar(frame, mainPanel, panelNorth);
     }
-    public static void setMenuBar(JFrame frame, JPanel panel, PanelNorth panelNorth) {
+    public static void setMenuBar(JFrame frame, CreatePanel panel, PanelNorth panelNorth) {
         JMenuBar primaryMenu = new JMenuBar();
         primaryMenu.setLayout(new FlowLayout());
-        primaryMenu.setBackground(Colors.BACKGROUND);
+        primaryMenu.setBackground(Colors.MENUBARBACKGROUND);
         LoadImage loadImage = new LoadImage(primaryMenu, panel);
 
         EditViewButton editViewButton = new EditViewButton(primaryMenu, panel, panelNorth);

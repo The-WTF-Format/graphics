@@ -16,7 +16,7 @@ public class EditorMenu extends MenuBar{
     private void addComponents() {
         // just an example
         menuBar.setLayout(new FlowLayout());
-        menuBar.setBackground(Colors.BACKGROUND);
+        menuBar.setBackground(Colors.MENUBARBACKGROUND);
         JButton button1 = new JButton("Editor Button1");
         button1.setPreferredSize(new Dimension(Size.BUTTONSIZESECONDARYMENU));
         button1.setMinimumSize(new Dimension(Size.BUTTONSIZESECONDARYMENU));
