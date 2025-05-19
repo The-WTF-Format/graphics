@@ -70,6 +70,7 @@ public class FunctionMenu {
     //Converter
     private void addConverter() {
         JMenu converterMenu = new JMenu("General");
+        // todo change one "General" to another String - this one could be called "format"
         converterMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);

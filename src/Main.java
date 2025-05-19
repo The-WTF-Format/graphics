@@ -33,10 +33,9 @@ public class Main {
         JMenuBar primaryMenu = new JMenuBar();
         primaryMenu.setLayout(new FlowLayout());
         primaryMenu.setBackground(Colors.MENUBARBACKGROUND);
-        LoadImage loadImage = new LoadImage(primaryMenu, panel);
 
         EditViewButton editViewButton = new EditViewButton(primaryMenu, panel, panelNorth);
-
+        LoadImage loadImage = new LoadImage(primaryMenu, panel, editViewButton);
         primaryMenu.add(editViewButton.getViewer());
         primaryMenu.add(editViewButton.getEditor());
         frame.setJMenuBar(primaryMenu);

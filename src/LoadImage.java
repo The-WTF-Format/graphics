@@ -9,18 +9,20 @@ import java.io.File;
 import java.nio.file.Path;
 
 public class LoadImage {
+    JButton saveButton;
     JMenuBar menu;
     JMenu loadImage;
     CreatePanel panel;
     CreatePanel createImage;
     ImagePanel imagePanel;
     BufferedImage image;
-    JTextField text = new JTextField();
     JMenuItem createNewImage;
     JMenuItem byPath;
-    LoadImage(JMenuBar menu, CreatePanel panel) {
+    EditViewButton editViewButton;
+    LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
         this.panel = panel;
+        this.editViewButton = editViewButton;
         addMenu();
     }
     private void addMenu() {
@@ -30,6 +32,7 @@ public class LoadImage {
         loadImage.setMaximumSize(Size.BUTTONSIZEMAINMENU);
         menu.add(loadImage);
         addMenuItems();
+        saveImage();
     }
     private void addMenuItems() {
         addPathItem();
@@ -59,10 +62,8 @@ public class LoadImage {
                 */
                 //probeweise ohne WtfImageBuilder parameter
                 //-----
-                byPath.setVisible(false);
-                createNewImage.setVisible(false);
+                Visible.setInvisible(byPath, createNewImage, saveButton, editViewButton.getEditor(), editViewButton.getViewer());
                 createNewImage();
-                saveImage();
                 panel.revalidate();
                 panel.repaint();
             }
@@ -81,16 +82,20 @@ public class LoadImage {
                 if(imagePanel != null) {
                     panel.remove(imagePanel);
                 }
+                Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor());
                 getNewImage();
 
                 //-----
                 //todo ersetzten mit ... und mehr
                 //from(getNewPath());
                 //-----
-
+                if(editViewButton.isEditorVisible()) {
+                    Visible.setVisible(saveButton, editViewButton.getViewer());
+                } else {
+                    Visible.setVisible(saveButton, editViewButton.getEditor());
+                }
                 imagePanel = new ImagePanel(image);
                 panel.add(imagePanel, BorderLayout.CENTER);
-                saveImage();
                 panel.revalidate();
                 panel.repaint();
             }
@@ -126,12 +131,13 @@ public class LoadImage {
         return null;
     }
     private void saveImage() {
-        JButton saveButton = new JButton("save Image");
+        saveButton = new JButton("save Image");
         saveButton.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         saveButton.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         saveButton.setMaximumSize(Size.BUTTONSIZEMAINMENU);
         saveButton.setBackground(Colors.ITEMSPRIMARY);
         panel.add(saveButton, BorderLayout.SOUTH);
+        Visible.setInvisible(saveButton);
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -168,8 +174,11 @@ public class LoadImage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.remove(createImage);
-                byPath.setVisible(true);
-                createNewImage.setVisible(true);
+                if(editViewButton.isEditorVisible()) {
+                    Visible.setVisible(byPath, createNewImage, saveButton, editViewButton.getViewer());
+                } else {
+                    Visible.setVisible(byPath, createNewImage, saveButton, editViewButton.getEditor());
+                }
                 panel.revalidate();
                 panel.repaint();
             }
