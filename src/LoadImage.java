@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 public class LoadImage {
     JButton saveButton;
@@ -19,6 +20,7 @@ public class LoadImage {
     JMenuItem createNewImage;
     JMenuItem byPath;
     EditViewButton editViewButton;
+    ArrayList<JComponent> setVisibility;
     LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
         this.panel = panel;
@@ -146,46 +148,7 @@ public class LoadImage {
         });
     }
     private void createNewImage() {
-        //todo in getrennte KLasse auslagern
-        createImage = new CreatePanel();
-        createImage.setLayout(new BoxLayout(createImage, BoxLayout.X_AXIS));
-        panel.add(createImage, BorderLayout.CENTER);
-        createImage.add(Box.createHorizontalStrut(50));
-        //0.
-        JLabel label = new JLabel("Please enter all attributes:");
-        createImage.add(label);
-        createImage.add(Box.createHorizontalStrut(100));
-        //1.
-        JSpinner width = new JSpinner(new SpinnerNumberModel(1, 1, 65535, 1));
-        width.setPreferredSize(new Dimension(200, 200));
-        width.setMaximumSize(new Dimension(200, 200));
-        width.setMinimumSize(new Dimension(200, 200));
-        width.setName("Width");
-        createImage.add(width);
-        createImage.add(Box.createHorizontalStrut(100));
-        //2.
-        JButton next = new JButton("next");
-        createImage.add(next);
-        createImage.add(Box.createHorizontalStrut(100));
-        JButton cancel = new JButton("cancel");
-        createImage.add(cancel);
-        createImage.add(Box.createHorizontalStrut(50));
-        cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                panel.remove(createImage);
-                if(editViewButton.isEditorVisible()) {
-                    Visible.setVisible(byPath, createNewImage, saveButton, editViewButton.getViewer());
-                } else {
-                    Visible.setVisible(byPath, createNewImage, saveButton, editViewButton.getEditor());
-                }
-                panel.revalidate();
-                panel.repaint();
-            }
-        });
-
-        // todo usw.
-        // todo Konzept wie Attributes "abarbeiten" fehlt
+        new CreateNewImage(this);
     }
 
 }

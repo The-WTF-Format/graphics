@@ -15,6 +15,7 @@ public class EditViewButton {
 
     public boolean isEditorVisible() {
         return editor.isVisible();
+        //todo mit boolean arbeiten und "shouldEditorBeVisible
     }
 
     public EditViewButton(JMenuBar menuBar, JPanel panel, PanelNorth panelNorth) {
