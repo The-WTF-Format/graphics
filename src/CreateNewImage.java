@@ -1,17 +1,21 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class CreateNewImage {
     CreatePanel integerValuePanel;
     CreatePanel colorSpacePanel;
     LoadImage loadImage;
-    JComponent [] integerComponents = new JComponent[8];
-    String [] integerText = new String []{"Width", "Height", "", "bla", "blabla", "", "hj", "hjjk"};
-
-    JPanel [] integerValuePanels = new JPanel[9];
-    JPanel [] colorSpacePanels = new JPanel[4];
+    JSpinner [] integerValueSpinner = new JSpinner[12];
+    JLabel [] integerTextField = new JLabel[12];
+    final String [] integerText = new String []{"", "Width (1 - 65 535)", "Height (1 - 65 535)", "", "", "Seconds per frame (1 - 127)", "Frames per Seconds (1 - 127)", "", "", "Frames (1 - 255)", "Channel Width (1 - 16)", ""};
+    JRadioButton [] colorSpaceButtons = new JRadioButton[15];
+    JPanel [] integerValuePanels = new JPanel[12];
+    JPanel [] colorSpacePanels = new JPanel[6];
     CreateNewImage( LoadImage loadImage) {
         this.integerValuePanel = new CreatePanel();
         this.colorSpacePanel = new CreatePanel();
@@ -20,41 +24,42 @@ public class CreateNewImage {
     }
     void setPanelsIntegerValues() {
         loadImage.panel.add(integerValuePanel, BorderLayout.CENTER);
-        integerValuePanel.setLayout(new GridLayout(3, 3));
-        for(int i = 0; i < 9; i++) {
+        integerValuePanel.setLayout(new GridLayout(3, 4));
+        for(int i = 0; i < 12; i++) {
             integerValuePanels[i] = new JPanel();
             integerValuePanel.add(integerValuePanels[i]);
             //gridPanels[i].setBackground(new Color(20*i, 20*i, 20*i));
             integerValuePanels[i].setBackground(Colors.BACKGROUND);
         }
-        setCancel(integerValuePanels[8], integerValuePanel);
+        setCancel(integerValuePanels[11], integerValuePanel);
         setNext();
         setIntegerValues();
     }
     void setPanelsColorSpace() {
         loadImage.panel.add(colorSpacePanel, BorderLayout.CENTER);
-        colorSpacePanel.setLayout(new GridLayout(2,2));
-        for(int i = 0; i < 4; i++) {
+        colorSpacePanel.setLayout(new GridLayout(3,2));
+        for(int i = 0; i < 6; i++) {
             colorSpacePanels[i] = new JPanel();
             colorSpacePanel.add(colorSpacePanels[i]);
             //colorSpacePanels[i].setBackground(new Color(20*i, 20*i, 20*i));
             colorSpacePanels[i].setBackground(Colors.BACKGROUND);
         }
-        setCancel(colorSpacePanels[3], colorSpacePanel);
+        setCancel(colorSpacePanels[5], colorSpacePanel);
         setConclude();
         setColorSpace();
     }
     void setNext() {
-        integerValuePanels[8].setLayout(new FlowLayout());
+        integerValuePanels[11].setLayout(new FlowLayout());
         JButton next = new JButton("next");
         next.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         next.setMaximumSize(Size.BUTTONSIZEMAINMENU);
         next.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         next.setBackground(Colors.ITEMSSECONDARY);
-        integerValuePanels[8].add(next);
+        integerValuePanels[11].add(next);
         next.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                checkValidInteger();
                 loadImage.panel.remove(integerValuePanel);
                 setPanelsColorSpace();
                 loadImage.panel.revalidate();
@@ -84,17 +89,16 @@ public class CreateNewImage {
         });
     }
     void setConclude() {
-        JButton conclude = new JButton("conclude");
-        conclude.setMinimumSize(Size.BUTTONSIZEMAINMENU);
-        conclude.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-        conclude.setPreferredSize(Size.BUTTONSIZEMAINMENU);
-        conclude.setBackground(Colors.ITEMSSECONDARY);
-        colorSpacePanels[3].add(conclude);
-        conclude.addActionListener(new ActionListener() {
+        JButton save = new JButton("save");
+        save.setMinimumSize(Size.BUTTONSIZEMAINMENU);
+        save.setMaximumSize(Size.BUTTONSIZEMAINMENU);
+        save.setPreferredSize(Size.BUTTONSIZEMAINMENU);
+        save.setBackground(Colors.ITEMSSECONDARY);
+        colorSpacePanels[5].add(save);
+        save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loadImage.panel.remove(colorSpacePanel);
-                //todo darstellen vom erwünschten!
                 if(loadImage.editViewButton.isEditorVisible()) {
                     Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer());
                 } else {
@@ -106,14 +110,14 @@ public class CreateNewImage {
         });
     }
     void setIntegerValues() {
-        for (int i = 0; i < 8; i++) {
-            if(i != 2 && i != 5) {
-                integerComponents[i] = new JTextField(integerText[i]);
-                integerValuePanels[i].add(integerComponents[i]);
-            }
-            if(i == 5) {
-                integerComponents[i] = new JLabel("Enter all Features or choose 'Default Value':");
-                integerValuePanels[i].add(integerComponents[i]);
+        for (int i = 0; i < 11; i++) {
+            if(i != 0 && i != 3 && i != 4 && i != 7 && i != 8) {
+                integerValuePanels[i].setLayout(new GridLayout(3, 1));
+                integerTextField[i] = new JLabel(integerText[i]);
+                integerValuePanels[i].add(integerTextField[i]);
+                integerValueSpinner[i] = new JSpinner();
+                integerValuePanels[i].add(integerValueSpinner[i]);
+                //todo, get default value
             }
         }
     }
@@ -121,9 +125,33 @@ public class CreateNewImage {
 
     }
     void setColorSpace() {
+        //colorSpacePanels[0].setLayout(new FlowLayout());
+        ButtonGroup buttonGroup = new ButtonGroup();
+        for(int i = 0; i < 15; i++) {
+            colorSpaceButtons[i] = new JRadioButton(String.valueOf(i));
+            buttonGroup.add(colorSpaceButtons[i]);
+            colorSpacePanels[2].add(colorSpaceButtons[i]);
+        }
 
     }
     void removeColorSpace() {
 
+    }
+    void checkValidInteger() {
+        for(int i = 0; i < 12; i++) {
+            if(integerValueSpinner[i]!= null) {
+                integerValueSpinner[i].addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        /*
+                        //todo
+                        // dies ist nur ein Beispiel, so analog sind die Intervalle nicht geeignet
+                        if (integerValueSpinner[i].getValue() < 1 || integerValueSpinner[i] > 65535) {
+
+                        }*/
+                    }
+                });
+            }
+        }
     }
 }
