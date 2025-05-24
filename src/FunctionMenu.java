@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 //ähnlich aufgebaut wie LoadImage
 //Hier wird ein neues Panel mit einer MenuBar darin erstellt, in der MenuBar sind 4 Gruppen und jeweiligen Untergruppen, die die Funktion des Editors beschreiben
@@ -104,4 +105,35 @@ public class FunctionMenu {
         }
         return subMenu;
     }
+
+    private void colorSpaceSelection() {
+        CreatePanel panel = new CreatePanel();
+        panel.setLayout(new GridLayout(5,3));
+        ButtonGroup group = new ButtonGroup();
+        String [] names = new String[15];
+        JRadioButton [] buttons = new JRadioButton[15];
+        // TODO Namen von der Enumklasse extrahieren und dann mit einer Schleife zuweisen
+        names[0] = "RGB";
+        names[1] = "RGBa";
+        names[2] = "DYNAMIC_RGBa";
+        names[3] = "GRAY_SCALE";
+        names[4] = "GRAY_SCALE_A";
+        names[5] = "DYNAMIC_GRAY_SCALE_A";
+        names[6] = "CMY";
+        names[7] = "CMYa";
+        names[8] = "DYNAMIC_CMYa";
+        names[9] = "HSV";
+        names[10] = "HSVa";
+        names[11] = "DYNAMIC_HSVa";
+        names[12] = "YCbCr";
+        names[13] = "YCbCra";
+        names[14] = "DYNAMIC_YCbCra";
+        for(int i = 0; i < 15; i++){
+            buttons[i] = new JRadioButton(names[i]);
+            group.add(buttons[i]);
+            panel.add(buttons[i]);
+        }
+        // TODO Beim Aufruf der Methode muss das Panel als PopUp dargestellt werden
+    }
+
 }
