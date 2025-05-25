@@ -4,7 +4,9 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+
+import wtf.file.api.builder.WtfImageBuilder;
+import wtf.file.api.color.ColorSpace;
 
 public class CreateNewImage {
     CreatePanel integerValuePanel;
@@ -16,6 +18,7 @@ public class CreateNewImage {
     JRadioButton [] colorSpaceButtons = new JRadioButton[15];
     JPanel [] integerValuePanels = new JPanel[12];
     JPanel [] colorSpacePanels = new JPanel[6];
+    ColorSpace selectedColorSpace;
     CreateNewImage( LoadImage loadImage) {
         this.integerValuePanel = new CreatePanel();
         this.colorSpacePanel = new CreatePanel();
@@ -98,6 +101,9 @@ public class CreateNewImage {
         save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //testing if the correct Colorspace gets saved:
+                //System.out.println(selectedColorSpace.name());
+
                 loadImage.panel.remove(colorSpacePanel);
                 if(loadImage.editViewButton.isEditorVisible()) {
                     Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer());
@@ -117,20 +123,28 @@ public class CreateNewImage {
                 integerValuePanels[i].add(integerTextField[i]);
                 integerValueSpinner[i] = new JSpinner();
                 integerValuePanels[i].add(integerValueSpinner[i]);
-                //todo, get default value
             }
         }
+        integerValueSpinner[1].setValue(WtfImageBuilder.DEFAULT_CHANNEL_WIDTH);
+        integerValueSpinner[9].setValue(WtfImageBuilder.DEFAULT_FRAMES);
     }
     void removeIntegerValue() {
 
     }
     void setColorSpace() {
-        //colorSpacePanels[0].setLayout(new FlowLayout());
         ButtonGroup buttonGroup = new ButtonGroup();
+        ColorSpace[] colorspaces = ColorSpace.values();
         for(int i = 0; i < 15; i++) {
-            colorSpaceButtons[i] = new JRadioButton(String.valueOf(i));
+            colorSpaceButtons[i] = new JRadioButton(colorspaces[i].name());
             buttonGroup.add(colorSpaceButtons[i]);
             colorSpacePanels[2].add(colorSpaceButtons[i]);
+            colorSpaceButtons[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JRadioButton source = (JRadioButton) e.getSource();
+                    selectedColorSpace = ColorSpace.valueOf(source.getText());
+                }
+            });
         }
 
     }

@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import wtf.file.api.*;
 
 //ähnlich aufgebaut wie LoadImage
 //Hier wird ein neues Panel mit einer MenuBar darin erstellt, in der MenuBar sind 4 Gruppen und jeweiligen Untergruppen, die die Funktion des Editors beschreiben
