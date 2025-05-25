@@ -12,9 +12,10 @@ public class EditViewButton {
     JPanel panel;
     JButton viewer;
     JButton editor;
+    Boolean editorOfficiallyVisible;
 
     public boolean isEditorVisible() {
-        return editor.isVisible();
+        return editorOfficiallyVisible;
         //todo mit boolean arbeiten und "shouldEditorBeVisible
     }
 
@@ -22,6 +23,7 @@ public class EditViewButton {
         this.panel = panel;
         this.panelNorth = panelNorth;
         this.menuBar = menuBar;
+        editorOfficiallyVisible = false;
         viewerButton();
         editorButton();
     }
@@ -42,8 +44,9 @@ public class EditViewButton {
         viewer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Visible.setInvisible(viewer);
-                Visible.setVisible(editor);
+                Visible.setInvisible(viewer, panelNorth.editorMenuBar);
+                Visible.setVisible(editor, panelNorth.viewerMenuBar);
+                editorOfficiallyVisible = false;
                 panel.remove(panelNorth.editorMenuBar);
                 panel.add(panelNorth.viewerMenuBar, BorderLayout.NORTH);
                 panel.revalidate();
@@ -87,8 +90,9 @@ public class EditViewButton {
         editor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Visible.setInvisible(editor);
-                Visible.setVisible(viewer);
+                Visible.setInvisible(editor, panelNorth.viewerMenuBar);
+                Visible.setVisible(viewer, panelNorth.editorMenuBar);
+                editorOfficiallyVisible = true;
                 panel.remove(panelNorth.viewerMenuBar);
                 panel.add(panelNorth.editorMenuBar, BorderLayout.NORTH);
                 panel.revalidate();

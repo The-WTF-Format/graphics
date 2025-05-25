@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import wtf.file.api.WtfImage;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
 
@@ -14,12 +15,16 @@ public class CreateNewImage {
     LoadImage loadImage;
     JSpinner [] integerValueSpinner = new JSpinner[12];
     JLabel [] integerTextField = new JLabel[12];
+    final int lowerBound = 1;
+    final int [] upperBound = new int[] {0, 65535, 65535, 0, 0, 127, 127, 0, 0, 255, 16, 0};
     final String [] integerText = new String []{"", "Width (1 - 65 535)", "Height (1 - 65 535)", "", "", "Seconds per frame (1 - 127)", "Frames per Seconds (1 - 127)", "", "", "Frames (1 - 255)", "Channel Width (1 - 16)", ""};
     JRadioButton [] colorSpaceButtons = new JRadioButton[15];
     JPanel [] integerValuePanels = new JPanel[12];
     JPanel [] colorSpacePanels = new JPanel[6];
     ColorSpace selectedColorSpace;
-    CreateNewImage( LoadImage loadImage) {
+    WtfImageBuilder builder;
+    CreateNewImage(LoadImage loadImage, WtfImageBuilder builder) {
+        this.builder = builder;
         this.integerValuePanel = new CreatePanel();
         this.colorSpacePanel = new CreatePanel();
         this.loadImage = loadImage;
@@ -62,11 +67,12 @@ public class CreateNewImage {
         next.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                checkValidInteger();
-                loadImage.panel.remove(integerValuePanel);
-                setPanelsColorSpace();
-                loadImage.panel.revalidate();
-                loadImage.panel.repaint();
+                if(checkValidInteger()){
+                    loadImage.panel.remove(integerValuePanel);
+                    setPanelsColorSpace();
+                    loadImage.panel.revalidate();
+                    loadImage.panel.repaint();
+                }
             }
         });
     }
@@ -82,7 +88,7 @@ public class CreateNewImage {
             public void actionPerformed(ActionEvent e) {
                 loadImage.panel.remove(mainPanel);
                 if(loadImage.editViewButton.isEditorVisible()) {
-                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer());
+                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer(), loadImage.editViewButton.panelNorth.editorMenuBar);
                 } else {
                     Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getEditor());
                 }
@@ -101,17 +107,26 @@ public class CreateNewImage {
         save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //testing if the correct Colorspace gets saved:
-                //System.out.println(selectedColorSpace.name());
+                if(selectedColorSpace!= null) {
 
-                loadImage.panel.remove(colorSpacePanel);
-                if(loadImage.editViewButton.isEditorVisible()) {
-                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer());
-                } else {
-                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getEditor());
+                    //testing if the correct Colorspace gets saved:
+                    //System.out.println(selectedColorSpace.name());
+                    loadImage.panel.remove(colorSpacePanel);
+                    if(loadImage.editViewButton.isEditorVisible()) {
+                        Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer(), loadImage.editViewButton.panelNorth.editorMenuBar);
+                    } else {
+                        Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getEditor());
+                    }
+                    loadImage.onCreateNewImageDone(
+                            (int)integerValueSpinner[1].getValue(),
+                            (int)integerValueSpinner[2].getValue(),
+                            (int)integerValueSpinner[5].getValue(),
+                            (int)integerValueSpinner[6].getValue(),
+                            (int)integerValueSpinner[9].getValue(),
+                            (int)integerValueSpinner[10].getValue(), selectedColorSpace);
+                    loadImage.panel.revalidate();
+                    loadImage.panel.repaint();
                 }
-                loadImage.panel.revalidate();
-                loadImage.panel.repaint();
             }
         });
     }
@@ -148,24 +163,16 @@ public class CreateNewImage {
         }
 
     }
-    void removeColorSpace() {
-
-    }
-    void checkValidInteger() {
-        for(int i = 0; i < 12; i++) {
-            if(integerValueSpinner[i]!= null) {
-                integerValueSpinner[i].addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        /*
-                        //todo
-                        // dies ist nur ein Beispiel, so analog sind die Intervalle nicht geeignet
-                        if (integerValueSpinner[i].getValue() < 1 || integerValueSpinner[i] > 65535) {
-
-                        }*/
-                    }
-                });
+    boolean checkValidInteger() {
+        for(int i = 0; i < 11; i++) {
+            if(i != 0 && i != 3 && i != 4 && i != 7 && i != 8) {
+                int value = (int) integerValueSpinner[i].getValue();
+                if(value < lowerBound || value > upperBound[i]) {
+                    JOptionPane.showMessageDialog(integerValuePanel, "You used an invalid value for: \n" + integerText[i]+"\nPlease change this value!", "Invalid Value", JOptionPane.INFORMATION_MESSAGE);
+                    return false;
+                }
             }
         }
+        return true;
     }
 }

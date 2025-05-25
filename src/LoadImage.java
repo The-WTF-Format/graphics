@@ -1,3 +1,9 @@
+import wtf.file.api.WtfImage;
+import wtf.file.api.WtfLoader;
+import wtf.file.api.builder.WtfImageBuilder;
+import wtf.file.api.color.ColorSpace;
+import wtf.file.api.exception.WtfException;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -6,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -21,6 +28,8 @@ public class LoadImage {
     JMenuItem byPath;
     EditViewButton editViewButton;
     ArrayList<JComponent> setVisibility;
+    WtfImage wtfImage;
+    WtfImageBuilder builder;
     LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
         this.panel = panel;
@@ -47,25 +56,13 @@ public class LoadImage {
         createNewImage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // todo alles entfernen, was an dieser Position ist
                 if(imagePanel!= null) {
                     // sollte so funktionieren, da ein dargestelltes Bild ua. genau in der Mitte vorhanden sein sollte
                     panel.remove(imagePanel);
                 }
-
-                //-----
-                /*
-                //todo ersetzten mit ... und mehr
-                WtfImageBuilder builder = by();
+                builder = WtfLoader.by();
+                Visible.setInvisible(byPath, createNewImage, saveButton, editViewButton.getEditor(), editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
                 createNewImage(builder);
-                panel.remove(createImage);
-                //todo neue Items hinzufügen um die ganzen Angaben angeben zu können - z.B. Buttons, Sliders ec.
-                //todo mit den Methoden neues Bild kreieren
-                */
-                //probeweise ohne WtfImageBuilder parameter
-                //-----
-                Visible.setInvisible(byPath, createNewImage, saveButton, editViewButton.getEditor(), editViewButton.getViewer());
-                createNewImage();
                 panel.revalidate();
                 panel.repaint();
             }
@@ -84,18 +81,20 @@ public class LoadImage {
                 if(imagePanel != null) {
                     panel.remove(imagePanel);
                 }
-                Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor());
+                Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
                 getNewImage();
+                /*try {
+                    wtfImage = WtfLoader.from(getNewPath());
+                } catch (WtfException | IOException ex) {
+                    System.out.println("This is an invalid Path");
+                }*/
 
-                //-----
-                //todo ersetzten mit ... und mehr
-                //from(getNewPath());
-                //-----
                 if(editViewButton.isEditorVisible()) {
-                    Visible.setVisible(saveButton, editViewButton.getViewer());
+                    Visible.setVisible(saveButton, editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
                 } else {
                     Visible.setVisible(saveButton, editViewButton.getEditor());
                 }
+
                 imagePanel = new ImagePanel(image);
                 panel.add(imagePanel, BorderLayout.CENTER);
                 panel.revalidate();
@@ -147,8 +146,19 @@ public class LoadImage {
             }
         });
     }
-    private void createNewImage() {
-        new CreateNewImage(this);
+    private void createNewImage(WtfImageBuilder builder) {
+        new CreateNewImage(this, builder);
     }
 
+    void onCreateNewImageDone(int valWidth, int valHeight, int valSecondsPerFrame, int valFramePerSeconds, int valFrames, int valChannelWidth, ColorSpace colorspace) {
+        builder.width(valWidth);
+        builder.height(valHeight);
+        builder.secondsPerFrame(valSecondsPerFrame);
+        builder.framesPerSecond(valFramePerSeconds);
+        builder.frames(valFrames);
+        builder.channelWidth(valChannelWidth);
+        builder.colorSpace(colorspace);
+        wtfImage = builder.build();
+        //todo Darstellen von WTFImage
+    }
 }
