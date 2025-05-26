@@ -3,6 +3,7 @@ import wtf.file.api.WtfLoader;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
 import wtf.file.api.exception.WtfException;
+import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class LoadImage {
     JButton saveButton;
@@ -26,6 +28,7 @@ public class LoadImage {
     BufferedImage image;
     JMenuItem createNewImage;
     JMenuItem byPath;
+    JMenuItem normalImage;
     EditViewButton editViewButton;
     ArrayList<JComponent> setVisibility;
     WtfImage wtfImage;
@@ -48,6 +51,7 @@ public class LoadImage {
     private void addMenuItems() {
         addPathItem();
         addCreateItem();
+        getNormalImageByPath();
     }
     private void addCreateItem() {
         createNewImage = new JMenuItem("create new image");
@@ -75,19 +79,17 @@ public class LoadImage {
         byPath.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // todo Entweder diese Art Bilder hochladen als 3. Variante behalten oder diesen Teil löschen und nur mit WtfLoader arbeiten
-
-                // todo alles entfernen, was an dieser Position ist
                 if(imagePanel != null) {
                     panel.remove(imagePanel);
                 }
                 Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
-                getNewImage();
-                /*try {
-                    wtfImage = WtfLoader.from(getNewPath());
+
+                try {
+                    wtfImage = WtfLoader.from(Objects.requireNonNull(getNewPath()));
                 } catch (WtfException | IOException ex) {
                     System.out.println("This is an invalid Path");
-                }*/
+                }
+
 
                 if(editViewButton.isEditorVisible()) {
                     Visible.setVisible(saveButton, editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
@@ -95,7 +97,31 @@ public class LoadImage {
                     Visible.setVisible(saveButton, editViewButton.getEditor());
                 }
 
-                imagePanel = new ImagePanel(image);
+                imagePanel = new ImagePanel(wtfImage.asJavaImage());
+                panel.add(imagePanel, BorderLayout.CENTER);
+                panel.revalidate();
+                panel.repaint();
+            }
+        });
+    }
+    private void getNormalImageByPath() {
+        normalImage = new JMenuItem("get normal Image");
+        loadImage.add(normalImage);
+        normalImage.setBackground(Colors.ITEMSPRIMARY);
+        normalImage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(imagePanel != null) {
+                    panel.remove(imagePanel);
+                }
+                Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
+                getNewImage();
+                if(editViewButton.isEditorVisible()) {
+                    Visible.setVisible(saveButton, editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
+                } else {
+                    Visible.setVisible(saveButton, editViewButton.getEditor());
+                }
+                imagePanel = new BufferedImagePanel(image);
                 panel.add(imagePanel, BorderLayout.CENTER);
                 panel.revalidate();
                 panel.repaint();
@@ -159,6 +185,12 @@ public class LoadImage {
         builder.channelWidth(valChannelWidth);
         builder.colorSpace(colorspace);
         wtfImage = builder.build();
+
+        imagePanel = new ImagePanel(wtfImage.asJavaImage());
+        panel.add(imagePanel, BorderLayout.CENTER);
+        panel.revalidate();
+        panel.repaint();
+        System.out.println("Im here but nothing happens");
         //todo Darstellen von WTFImage
     }
 }

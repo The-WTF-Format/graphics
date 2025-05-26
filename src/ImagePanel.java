@@ -3,11 +3,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class ImagePanel extends JPanel {
-
-    private final BufferedImage image;
-    public ImagePanel(BufferedImage image) {
-     this.image = image;
+    Image image;
+    public ImagePanel(Image image) {
+        this.image= image;
      this.setBackground(Colors.BACKGROUND);
+    }
+    public ImagePanel() {
+        this.setBackground(Colors.BACKGROUND);
     }
     @Override
     protected void paintComponent(Graphics g) {
