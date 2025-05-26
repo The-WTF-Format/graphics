@@ -6,7 +6,7 @@ public class ImagePanel extends JPanel {
     Image image;
     public ImagePanel(Image image) {
         this.image= image;
-     this.setBackground(Colors.BACKGROUND);
+        this.setBackground(Colors.BACKGROUND);
     }
     public ImagePanel() {
         this.setBackground(Colors.BACKGROUND);

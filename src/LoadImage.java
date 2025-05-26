@@ -90,7 +90,6 @@ public class LoadImage {
                     System.out.println("This is an invalid Path");
                 }
 
-
                 if(editViewButton.isEditorVisible()) {
                     Visible.setVisible(saveButton, editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
                 } else {
