@@ -2,10 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class EditorMenu extends MenuBar{
+    private JPanel mainPanel;
     private CreatePanel panel;
-    EditorMenu() {
+    EditorMenu(JPanel mainPanel) {
+        this.mainPanel = mainPanel;
         addMenu();
-        this.panel = panel;
+
     }
     private void addMenu() {
         menuBar = new JMenuBar();
@@ -20,6 +22,6 @@ public class EditorMenu extends MenuBar{
         menuBar.setBackground(Colors.MENUBARBACKGROUND);
 
         //hier wird die zweite Menuleiste mit DropDown beschrieben
-        new FunctionMenu(menuBar, panel);
+        new FunctionMenu(menuBar, panel, mainPanel);
     }
 }

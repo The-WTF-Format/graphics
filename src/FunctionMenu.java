@@ -8,11 +8,13 @@ import wtf.file.api.*;
 public class FunctionMenu {
     JMenuBar menu;
     CreatePanel panel;
+    JPanel mainPanel;
 
     //Konstruktor
-    FunctionMenu(JMenuBar menu, CreatePanel panel) {
+    FunctionMenu(JMenuBar menu, CreatePanel panel, JPanel mainPanel) {
         this.menu = menu;
         this.panel = panel;
+        this.mainPanel = mainPanel;
         addMenus();
     }
 
@@ -23,6 +25,7 @@ public class FunctionMenu {
         addColorMenu();
         addGeneral();
         addConverter();
+        colorSpaceSelection();
     }
 
     // MENUS //
@@ -47,8 +50,8 @@ public class FunctionMenu {
         colorMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-
-        colorMenu.add(createSubMenu("Color Spaces", "Farbräume auswählen", "Transparenz"));
+        // todo wir benötigen diese Components jeweils als eigenständige Objekte mit Zugriff
+        //z.B.
         colorMenu.add(createSubMenu("Color Picker", "Farbname & Hexadezimalcode"));
         colorMenu.add(createSubMenu("Farbe invertieren", "Komplementärfarbe"));
 
@@ -108,8 +111,12 @@ public class FunctionMenu {
     }
 
     private void colorSpaceSelection() {
-        CreatePanel panel = new CreatePanel();
-        panel.setLayout(new GridLayout(5,3));
+        // Hinweis: habe den Namen deines loaklen Panels verändert, da dieser das globale Panel überschreibt.
+        CreatePanel gridPanel = new CreatePanel();
+        gridPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
+        gridPanel.setLayout(new GridLayout(5,3));
+        // TODO anderer Layouttyp wäre vermütlich sinnvoller (z.B. Borderlayout und dann alle im selben Bereich hinzufügen),
+        //  da auf diese Art die komplette Fläche genutzt wird und sehr "packed" ausschaut.
         ButtonGroup group = new ButtonGroup();
         String [] names = new String[15];
         JRadioButton [] buttons = new JRadioButton[15];
@@ -131,9 +138,13 @@ public class FunctionMenu {
         names[14] = "DYNAMIC_YCbCra";
         for(int i = 0; i < 15; i++){
             buttons[i] = new JRadioButton(names[i]);
+            buttons[i].setMaximumSize(new Dimension(80, 30));
+            buttons[i].setMaximumSize(new Dimension(80, 30));
+            buttons[i].setPreferredSize(new Dimension(80, 30));
             group.add(buttons[i]);
-            panel.add(buttons[i]);
+            gridPanel.add(buttons[i]);
         }
+        mainPanel.add(gridPanel, BorderLayout.EAST);
         // TODO Beim Aufruf der Methode muss das Panel als PopUp dargestellt werden
     }
 
