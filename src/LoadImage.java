@@ -2,7 +2,10 @@ import wtf.file.api.WtfImage;
 import wtf.file.api.WtfLoader;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
+import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.exception.WtfException;
+import wtf.file.api.impl.WtfImageBuilderImpl;
+import wtf.file.api.v1.impl.WtfImageImpl;
 import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
 import javax.imageio.ImageIO;
@@ -87,7 +90,7 @@ public class LoadImage {
                 try {
                     wtfImage = WtfLoader.from(Objects.requireNonNull(getNewPath()));
                 } catch (WtfException | IOException ex) {
-                    System.out.println("This is an invalid Path");
+                    System.out.println(ex);
                 }
 
                 if(editViewButton.isEditorVisible()) {
@@ -130,7 +133,7 @@ public class LoadImage {
     private void getNewImage() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Bild auswählen");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("jpg", "png", "jpeg"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter(null, "jpg", "png", "jpeg"));
 
         int result = fileChooser.showOpenDialog(panel);
         //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
@@ -147,7 +150,8 @@ public class LoadImage {
     private Path getNewPath() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Bild auswählen");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("jpg", "png", "jpeg"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter(null, "jpg", "png", "jpeg", "wtf"));
+        //TODO all possible formats
 
         int result = fileChooser.showOpenDialog(panel);
         //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
