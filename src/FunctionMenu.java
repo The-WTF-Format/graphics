@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.BiConsumer;
+
 import wtf.file.api.*;
 
 //ähnlich aufgebaut wie LoadImage
@@ -25,7 +27,6 @@ public class FunctionMenu {
         addColorMenu();
         addGeneral();
         addConverter();
-        colorSpaceSelection();
     }
 
     // MENUS //
@@ -52,8 +53,9 @@ public class FunctionMenu {
         colorMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
         // todo wir benötigen diese Components jeweils als eigenständige Objekte mit Zugriff
         //z.B.
-        colorMenu.add(createSubMenu("Color Picker", "Farbname & Hexadezimalcode"));
-        colorMenu.add(createSubMenu("Farbe invertieren", "Komplementärfarbe"));
+        colorMenu.add(createSubMenu("Color Picker", ActionRouter.createFunctionMenuActionRouter(this),"Farbname & Hexadezimalcode"));
+        colorMenu.add(createSubMenu("Farbe invertieren", ActionRouter.createFunctionMenuActionRouter(this),"Komplementärfarbe"));
+        colorMenu.add(createSubMenu("Color Space", ActionRouter.createFunctionMenuActionRouter(this),"Select color space"));
 
         menu.add(colorMenu);
     }
@@ -74,8 +76,9 @@ public class FunctionMenu {
 
     //Converter
     private void addConverter() {
-        JMenu converterMenu = new JMenu("General");
+        JMenu converterMenu = new JMenu("Format");
         // todo change one "General" to another String - this one could be called "format"
+        //done
         converterMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
@@ -98,19 +101,46 @@ public class FunctionMenu {
     }
 
     //Submenu erstellen
-    private JMenu createSubMenu(String name, String... items) {
+    private JMenu createSubMenu(String name, BiConsumer<JMenuItem, String> actionAssigner, String... items) {
         JMenu subMenu = new JMenu(name);
         for (String itemName : items) {
             JMenuItem item = new JMenuItem(itemName);
             item.setBackground(Colors.ITEMSSECONDARY);
             //todo möglichkeit von erstellen einer MenuStyler - verschiedene Gruppen mit verschiedenen Aussehen?
             subMenu.add(item);
-            //todo Method erstellen, wo action via name zugeordnert werden?!
+            //Action werden zugewiesen
+            actionAssigner.accept(item, itemName);
         }
         return subMenu;
     }
 
+    public static class ActionRouter {
+        //BiConsumer nimmt zwei Elemente entgegen und gibt keinen Rückgabe wert
+        //das Menüelement, was ausgewählt wird
+        //String, wie die Methode heißt
+
+        public static BiConsumer<JMenuItem, String> createFunctionMenuActionRouter(FunctionMenu functionMenu) {
+            return (item, name) -> {
+                item.addActionListener(e -> {
+                    switch (name) {
+                        case "Select color space":
+                            functionMenu.colorSpaceSelection();
+                            break;
+                        default:
+                            System.out.println("Unbekannte Aktion: " + name);
+                    }
+                });
+            };
+        }
+    }
+
     private void colorSpaceSelection() {
+        // TODO Beim Aufruf der Methode muss das Panel als PopUp dargestellt werden
+        //DONE JE
+        // Neues modales Pop-up (Dialogfenster)
+        JDialog dialog = new JDialog((Frame) null, "Farbraum auswählen", true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
         // Hinweis: habe den Namen deines loaklen Panels verändert, da dieser das globale Panel überschreibt.
         CreatePanel gridPanel = new CreatePanel();
         gridPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
@@ -144,8 +174,15 @@ public class FunctionMenu {
             group.add(buttons[i]);
             gridPanel.add(buttons[i]);
         }
-        mainPanel.add(gridPanel, BorderLayout.EAST);
-        // TODO Beim Aufruf der Methode muss das Panel als PopUp dargestellt werden
+        //mainPanel.add(gridPanel, BorderLayout.EAST);
+        dialog.getContentPane().add(gridPanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
+
     }
+
+
 
 }
