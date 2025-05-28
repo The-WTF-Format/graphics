@@ -13,6 +13,19 @@ public class BufferedImagePanel extends ImagePanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(bufferedImage, (int) (getWidth()*0.3)/2, 0, ( getWidth()- (int) (getWidth()*0.3)), getHeight(), this);
+        int availableWidth = getWidth() - 10;
+        int availableHeight = getHeight() - 10;
+
+        double widthRatio = (double) availableWidth/bufferedImage.getWidth(this);
+        double heightRatio = (double) availableHeight/bufferedImage.getHeight(this);
+
+        double scale = Math.min(widthRatio, heightRatio);
+
+        int scaledWidth = (int) (bufferedImage.getWidth(this)*scale);
+        int scaledHeight = (int) (bufferedImage.getHeight(this)*scale);
+        int x = 5 + (availableWidth - scaledWidth) / 2;
+        int y = 5 + (availableHeight - scaledHeight) / 2;
+
+        g.drawImage(bufferedImage, x, y, scaledWidth, scaledHeight, this);
     }
 }

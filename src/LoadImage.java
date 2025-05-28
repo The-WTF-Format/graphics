@@ -119,7 +119,7 @@ public class LoadImage {
                 } else {
                     Visible.setVisible(saveButton, editViewButton.getEditor());
                 }
-                editableWtfImage = wtfImage.edit();
+                //editableWtfImage = wtfImage.edit();
                 // auch wenn WTFImage gezeigt wird, wird doch immer auch EditableWTFImage gespeichert, damit man immer gleich bei Änderungen zu diesem wechseln kann
                 try {
                     showImage();
@@ -276,7 +276,6 @@ public class LoadImage {
         //todo zurückstellen
         //imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
         //panel.add(imagePanel, BorderLayout.CENTER);
-
         panel.revalidate();
         panel.repaint();
     }

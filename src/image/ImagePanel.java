@@ -23,17 +23,22 @@ public class ImagePanel extends JPanel {
 
         if (image == null) return;
 
-        double widthRatio = (double) getWidth()/image.getWidth(this);
-        double heightRatio = (double) getHeight()/image.getHeight(this);
 
-        double scale = Math.min(1.0, Math.min(widthRatio, heightRatio));
+        int availableWidth = getWidth() - 10;
+        int availableHeight = getHeight() - 10;
 
-        int scaledWidth = (int) (widthRatio*scale);
-        int scaledHeight = (int) (heightRatio*scale);
-        int x = (getWidth() - scaledWidth) / 2;
-        int y = (getHeight() - scaledHeight) / 2;
+        double widthRatio = (double) availableWidth/image.getWidth(this);
+        double heightRatio = (double) availableHeight/image.getHeight(this);
 
-        //g.drawImage(image, x, y, scaledWidth, scaledHeight, this);
-        g.drawImage(image, x, y, image.getWidth(this)*100, image.getHeight(this)*100, this);
+        double scale = Math.min(widthRatio, heightRatio);
+
+        int scaledWidth = (int) (image.getWidth(this)*scale);
+        int scaledHeight = (int) (image.getHeight(this)*scale);
+        int x = 5 + (availableWidth - scaledWidth) / 2;
+        int y = 5 + (availableHeight - scaledHeight) / 2;
+
+        g.drawImage(image, x, y, scaledWidth, scaledHeight, this);
+        //g.drawImage(image, x, y, image.getWidth(this)*100, image.getHeight(this)*100, this);
+
     }
 }
