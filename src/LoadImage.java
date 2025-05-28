@@ -6,7 +6,9 @@ import wtf.file.api.WtfImage;
 import wtf.file.api.WtfLoader;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
+import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.exception.WtfException;
+import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -26,7 +28,6 @@ public class LoadImage {
     JMenuBar menu;
     JMenu loadImage;
     CreatePanel panel;
-    CreatePanel createImage;
     ImagePanel imagePanel;
     BufferedImage image;
     JMenuItem createNewImage;
@@ -36,6 +37,7 @@ public class LoadImage {
     ArrayList<JComponent> setVisibility;
     WtfImage wtfImage;
     WtfImageBuilder builder;
+    EditableWtfImage editableWtfImage;
     LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
         this.panel = panel;
@@ -43,14 +45,14 @@ public class LoadImage {
         addMenu();
     }
 
-    void setImagePanel(Image image) {
-        this.imagePanel = new ImagePanel(image);
+    void setImagePanel(EditableWtfImage editableWtfImage) {
+        this.imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
     }
-    void setWtfImage(WtfImage wtfImage) {
-        this.wtfImage = wtfImage;
+    void setEditableWtfImage(EditableWtfImage editableWtfImage) {
+        this.editableWtfImage = editableWtfImage;
     }
-    WtfImage getWtfImage() {
-        return wtfImage;
+    EditableWtfImage getEditableWtfImage() {
+        return editableWtfImage;
     }
     ImagePanel getImagePanel() {
         return this.imagePanel;
@@ -83,6 +85,7 @@ public class LoadImage {
                 builder = WtfLoader.by();
                 Visible.setInvisible(byPath, createNewImage, saveButton, editViewButton.getEditor(), editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
                 createNewImage(builder);
+                editableWtfImage = wtfImage.edit();
                 panel.revalidate();
                 panel.repaint();
             }
@@ -110,10 +113,9 @@ public class LoadImage {
                 } else {
                     Visible.setVisible(saveButton, editViewButton.getEditor());
                 }
-                imagePanel = new ImagePanel(wtfImage.asJavaImage());
-                panel.add(imagePanel, BorderLayout.CENTER);
-                panel.revalidate();
-                panel.repaint();
+                editableWtfImage = wtfImage.edit();
+                showImage();
+
             }
         });
     }
@@ -161,7 +163,7 @@ public class LoadImage {
     private Path getNewPath() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Bild auswählen");
-        fileChooser.setFileFilter(new FileNameExtensionFilter(null, "jpg", "png", "jpeg", "wtf"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter(null, "wtf"));
         //TODO all possible formats
 
         int result = fileChooser.showOpenDialog(panel);
@@ -204,7 +206,18 @@ public class LoadImage {
                     .frames(valFrames).channelWidth(valChannelWidth).colorSpace(colorspace);
             wtfImage = builder.build();
         }
-        imagePanel = new ImagePanel(wtfImage.asJavaImage());
+        editableWtfImage = wtfImage.edit();
+        showImage();
+    }
+    void showImage() {
+        /*if(editViewButton.isEditorVisible()) {
+            imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
+            panel.add(imagePanel, BorderLayout.CENTER);
+        } else {
+            imagePanel = new ImagePanel(wtfImage.asJavaImage());
+            panel.add(imagePanel, BorderLayout.CENTER);
+        }*/
+        imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
         panel.add(imagePanel, BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();

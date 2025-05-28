@@ -1,9 +1,22 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.function.BiConsumer;
 
+import image.BufferedImagePanel;
+import image.ImagePanel;
 import values.Colors;
 import values.Size;
+import wtf.file.api.WtfImage;
+import wtf.file.api.color.ColorSpace;
+import wtf.file.api.editable.EditableWtfImage;
 
 //ähnlich aufgebaut wie LoadImage
 //Hier wird ein neues Panel mit einer MenuBar darin erstellt, in der MenuBar sind 4 Gruppen und jeweiligen Untergruppen, die die Funktion des Editors beschreiben
@@ -12,12 +25,13 @@ public class FunctionMenu {
     JMenuBar menu;
     CreatePanel panel;
     JPanel mainPanel;
-
+    PanelNorth panelNorth;
     //Konstruktor
-    FunctionMenu(JMenuBar menu, CreatePanel panel, JPanel mainPanel) {
+    FunctionMenu(JMenuBar menu, CreatePanel panel, JPanel mainPanel, PanelNorth panelNorth) {
         this.menu = menu;
         this.panel = panel;
         this.mainPanel = mainPanel;
+        this.panelNorth = panelNorth;
         addMenus();
     }
 
@@ -68,7 +82,16 @@ public class FunctionMenu {
         generalMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         generalMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
-        addMenuItem(generalMenu, "Höhe und Größe ändern");
+        // todo change it back: just trying
+        //addMenuItem(generalMenu, "Höhe und Größe ändern");
+        JMenuItem height = addMenuItem(generalMenu, "Höhe und Größe ändern");
+        height.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeWTFImageHeight();
+                repaintImage();
+            }
+        });
         addMenuItem(generalMenu, "Spiegeln");
         addMenuItem(generalMenu, "Drehen");
 
@@ -83,7 +106,6 @@ public class FunctionMenu {
         converterMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-
         addMenuItem(converterMenu, "GIF");
         addMenuItem(converterMenu, "JPEG");
         addMenuItem(converterMenu, "PNG");
@@ -184,9 +206,23 @@ public class FunctionMenu {
 
     }
     boolean hasExistingImage() {
-        return true;
+        if(panelNorth.loadImage.imagePanel!= null) {
+            return true;
+        }
+        return false;
+    }
+    void repaintImage() {
+        panelNorth.loadImage.panel.revalidate();
+        panelNorth.loadImage.panel.repaint();
     }
 
-
+    //Todo:
+    //Hinweise:
+    //How to change WTFImage:
+    //z.B. Change Height
+    void changeWTFImageHeight() {
+        panelNorth.loadImage.getEditableWtfImage().edit().setHeight(10);
+        panelNorth.loadImage.setImagePanel(panelNorth.loadImage.getEditableWtfImage());
+    }
 
 }
