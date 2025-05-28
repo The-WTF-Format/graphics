@@ -1,6 +1,9 @@
+package image;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import values.Colors;
 
 public class ImagePanel extends JPanel {
     Image image;

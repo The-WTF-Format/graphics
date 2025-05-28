@@ -1,11 +1,10 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import wtf.file.api.WtfImage;
+import values.Colors;
+import values.Size;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
 

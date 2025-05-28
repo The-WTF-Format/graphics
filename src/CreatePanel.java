@@ -1,3 +1,5 @@
+import values.Colors;
+
 import javax.swing.*;
 
 public class CreatePanel extends JPanel {

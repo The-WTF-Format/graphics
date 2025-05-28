@@ -1,3 +1,5 @@
+package values;
+
 import java.awt.*;
 
 public final class Size {

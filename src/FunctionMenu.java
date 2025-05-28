@@ -2,7 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.BiConsumer;
 
-import wtf.file.api.*;
+import values.Colors;
+import values.Size;
 
 //ähnlich aufgebaut wie LoadImage
 //Hier wird ein neues Panel mit einer MenuBar darin erstellt, in der MenuBar sind 4 Gruppen und jeweiligen Untergruppen, die die Funktion des Editors beschreiben
@@ -181,6 +182,9 @@ public class FunctionMenu {
         dialog.setVisible(true);
 
 
+    }
+    boolean hasExistingImage() {
+        return true;
     }
 
 

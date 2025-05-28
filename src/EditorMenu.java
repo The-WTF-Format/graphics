@@ -1,3 +1,6 @@
+import values.Colors;
+import values.Size;
+
 import javax.swing.*;
 import java.awt.*;
 

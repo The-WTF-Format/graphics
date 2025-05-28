@@ -1,3 +1,5 @@
+package values;
+
 import java.awt.*;
 
 public final class Colors {
@@ -7,7 +9,7 @@ public final class Colors {
     public static final Color ITEMSPRIMARY = new Color(170, 170, 170);
     public static final Color ITEMSSECONDARY = new Color(175, 175, 175);
     public static final Color CANCEL = new Color(140, 120, 120);
-    private Colors() {
+    public Colors() {
 
     }
 }

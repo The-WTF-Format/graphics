@@ -1,16 +1,7 @@
-import javax.imageio.ImageIO;
+import values.Colors;
+
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.event.MenuDragMouseEvent;
-import javax.swing.event.MenuDragMouseListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.ImageObserver;
-import java.text.AttributedCharacterIterator;
-import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {

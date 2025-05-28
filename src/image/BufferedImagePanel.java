@@ -1,7 +1,9 @@
+package image;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
-
-public class BufferedImagePanel extends ImagePanel{
+import values.Colors;
+public class BufferedImagePanel extends ImagePanel {
     private final BufferedImage bufferedImage;
     public BufferedImagePanel(BufferedImage bufferedImage) {
         super();

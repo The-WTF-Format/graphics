@@ -1,12 +1,12 @@
+import image.BufferedImagePanel;
+import image.ImagePanel;
+import values.Colors;
+import values.Size;
 import wtf.file.api.WtfImage;
 import wtf.file.api.WtfLoader;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
-import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.exception.WtfException;
-import wtf.file.api.impl.WtfImageBuilderImpl;
-import wtf.file.api.v1.impl.WtfImageImpl;
-import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
