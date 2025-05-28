@@ -42,6 +42,19 @@ public class LoadImage {
         this.editViewButton = editViewButton;
         addMenu();
     }
+
+    void setImagePanel(Image image) {
+        this.imagePanel = new ImagePanel(image);
+    }
+    void setWtfImage(WtfImage wtfImage) {
+        this.wtfImage = wtfImage;
+    }
+    WtfImage getWtfImage() {
+        return wtfImage;
+    }
+    ImagePanel getImagePanel() {
+        return this.imagePanel;
+    }
     private void addMenu() {
         loadImage = new JMenu("Load image");
         loadImage.setPreferredSize(Size.BUTTONSIZEMAINMENU);
@@ -86,7 +99,6 @@ public class LoadImage {
                     panel.remove(imagePanel);
                 }
                 Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
-
                 try {
                     wtfImage = WtfLoader.from(Objects.requireNonNull(getNewPath()));
                 } catch (WtfException | IOException ex) {
@@ -98,7 +110,6 @@ public class LoadImage {
                 } else {
                     Visible.setVisible(saveButton, editViewButton.getEditor());
                 }
-
                 imagePanel = new ImagePanel(wtfImage.asJavaImage());
                 panel.add(imagePanel, BorderLayout.CENTER);
                 panel.revalidate();
@@ -107,7 +118,7 @@ public class LoadImage {
         });
     }
     private void getNormalImageByPath() {
-        normalImage = new JMenuItem("get normal Image");
+        normalImage = new JMenuItem("Get standard format Image");
         loadImage.add(normalImage);
         normalImage.setBackground(Colors.ITEMSPRIMARY);
         normalImage.addActionListener(new ActionListener() {
@@ -180,20 +191,22 @@ public class LoadImage {
     }
 
     void onCreateNewImageDone(int valWidth, int valHeight, int valSecondsPerFrame, int valFramePerSeconds, int valFrames, int valChannelWidth, ColorSpace colorspace) {
-        builder.width(valWidth);
-        builder.height(valHeight);
-        builder.secondsPerFrame(valSecondsPerFrame);
-        builder.framesPerSecond(valFramePerSeconds);
-        builder.frames(valFrames);
-        builder.channelWidth(valChannelWidth);
-        builder.colorSpace(colorspace);
-        wtfImage = builder.build();
-
+        if(valFrames == 1 ) {
+            builder.width(valWidth).height(valHeight).frames(valFrames)
+                    .channelWidth(valChannelWidth).colorSpace(colorspace);
+            wtfImage = builder.build();
+        } else if (valFramePerSeconds != 0 ) {
+            builder.width(valWidth).height(valHeight).framesPerSecond(valFramePerSeconds)
+                    .frames(valFrames).channelWidth(valChannelWidth).colorSpace(colorspace);
+            wtfImage = builder.build();
+        } else {
+            builder.width(valWidth).height(valHeight).secondsPerFrame(valSecondsPerFrame)
+                    .frames(valFrames).channelWidth(valChannelWidth).colorSpace(colorspace);
+            wtfImage = builder.build();
+        }
         imagePanel = new ImagePanel(wtfImage.asJavaImage());
         panel.add(imagePanel, BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
-        System.out.println("Im here but nothing happens");
-        //todo Darstellen von WTFImage
     }
 }
