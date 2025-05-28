@@ -82,16 +82,16 @@ public class FunctionMenu {
         generalMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         generalMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
-        // todo change it back: just trying
-        //addMenuItem(generalMenu, "Höhe und Größe ändern");
-        JMenuItem height = addMenuItem(generalMenu, "Höhe und Größe ändern");
+        addMenuItem(generalMenu, "Höhe und Größe ändern");
+        // Code probieren obs klappt
+        /*JMenuItem height = addMenuItem(generalMenu, "Höhe und Größe ändern");
         height.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 changeWTFImageHeight();
                 repaintImage();
             }
-        });
+        });*/
         addMenuItem(generalMenu, "Spiegeln");
         addMenuItem(generalMenu, "Drehen");
 
@@ -212,17 +212,21 @@ public class FunctionMenu {
         return true;
     }
     void repaintImage() {
+        panelNorth.loadImage.imagePanel.revalidate();
+        panelNorth.loadImage.imagePanel.repaint();
         panelNorth.loadImage.panel.revalidate();
         panelNorth.loadImage.panel.repaint();
     }
 
-    //Todo:
     //Hinweise:
     //How to change WTFImage:
     //z.B. Change Height
-    void changeWTFImageHeight() {
-        panelNorth.loadImage.getEditableWtfImage().edit().setHeight(10);
-        panelNorth.loadImage.setImagePanel(panelNorth.loadImage.getEditableWtfImage());
-    }
+    // klappt leider noch nicht
+    /*void changeWTFImageHeight() {
+        panelNorth.loadImage.getEditableWtfImage().setHeight(10);
+        Image newImage = panelNorth.loadImage.editableWtfImage.asJavaImage();
+        panelNorth.loadImage.setImagePanel(newImage);
+        panelNorth.loadImage.imagePanel.setImage(newImage);
+    }*/
 
 }

@@ -11,6 +11,9 @@ public class ImagePanel extends JPanel {
         this.image= image;
         this.setBackground(Colors.BACKGROUND);
     }
+    public void setImage(Image image) {
+        this.image = image;
+    }
     public ImagePanel() {
         this.setBackground(Colors.BACKGROUND);
     }
@@ -30,6 +33,7 @@ public class ImagePanel extends JPanel {
         int x = (getWidth() - scaledWidth) / 2;
         int y = (getHeight() - scaledHeight) / 2;
 
-        g.drawImage(image, x, y, scaledWidth, scaledHeight, this);
+        //g.drawImage(image, x, y, scaledWidth, scaledHeight, this);
+        g.drawImage(image, x, y, image.getWidth(this)*100, image.getHeight(this)*100, this);
     }
 }
