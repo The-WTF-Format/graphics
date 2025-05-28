@@ -12,6 +12,8 @@ import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,8 +22,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class LoadImage {
     JButton saveButton;
@@ -34,7 +39,6 @@ public class LoadImage {
     JMenuItem byPath;
     JMenuItem normalImage;
     EditViewButton editViewButton;
-    ArrayList<JComponent> setVisibility;
     WtfImage wtfImage;
     WtfImageBuilder builder;
     EditableWtfImage editableWtfImage;
@@ -79,15 +83,14 @@ public class LoadImage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(imagePanel!= null) {
-                    // sollte so funktionieren, da ein dargestelltes Bild ua. genau in der Mitte vorhanden sein sollte
+                    if (unsavedWarning()) {
+                        return;
+                    }
                     panel.remove(imagePanel);
                 }
                 builder = WtfLoader.by();
                 Visible.setInvisible(byPath, createNewImage, saveButton, editViewButton.getEditor(), editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
                 createNewImage(builder);
-                editableWtfImage = wtfImage.edit();
-                panel.revalidate();
-                panel.repaint();
             }
         });
     }
@@ -99,6 +102,9 @@ public class LoadImage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(imagePanel != null) {
+                    if (unsavedWarning()) {
+                        return;
+                    }
                     panel.remove(imagePanel);
                 }
                 Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
@@ -113,14 +119,19 @@ public class LoadImage {
                 } else {
                     Visible.setVisible(saveButton, editViewButton.getEditor());
                 }
+                System.out.println("n Frames: " + wtfImage.animationInformation().frames());
                 editableWtfImage = wtfImage.edit();
-                showImage();
+                try {
+                    showImage();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
 
             }
         });
     }
     private void getNormalImageByPath() {
-        normalImage = new JMenuItem("Get standard format Image");
+        normalImage = new JMenuItem("get standard format Image");
         loadImage.add(normalImage);
         normalImage.setBackground(Colors.ITEMSPRIMARY);
         normalImage.addActionListener(new ActionListener() {
@@ -173,6 +184,16 @@ public class LoadImage {
         }
         return null;
     }
+    private Path getSavingPath() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Pfad auswählen");
+        int result = fileChooser.showOpenDialog(panel);
+        //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
+        if(result == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile().toPath();
+        }
+        return null;
+    }
     private void saveImage() {
         saveButton = new JButton("save Image");
         saveButton.setPreferredSize(Size.BUTTONSIZEMAINMENU);
@@ -184,7 +205,21 @@ public class LoadImage {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // todo save the image
+                if(editableWtfImage == null) {
+                    editableWtfImage = wtfImage.edit();
+                }
+                try {
+                    editableWtfImage.save(getSavingPath());
+                } catch (IOException | WtfException ex) {
+                    throw new RuntimeException(ex);
+                }
+                panel.remove(imagePanel);
+                Visible.setInvisible(saveButton);
+                imagePanel = null;
+                wtfImage = null;
+                editableWtfImage = null;
+                panel.repaint();
+                panel.revalidate();
             }
         });
     }
@@ -192,7 +227,7 @@ public class LoadImage {
         new CreateNewImage(this, builder);
     }
 
-    void onCreateNewImageDone(int valWidth, int valHeight, int valSecondsPerFrame, int valFramePerSeconds, int valFrames, int valChannelWidth, ColorSpace colorspace) {
+    void onCreateNewImageDone(int valWidth, int valHeight, int valSecondsPerFrame, int valFramePerSeconds, int valFrames, int valChannelWidth, ColorSpace colorspace) throws InterruptedException {
         if(valFrames == 1 ) {
             builder.width(valWidth).height(valHeight).frames(valFrames)
                     .channelWidth(valChannelWidth).colorSpace(colorspace);
@@ -209,17 +244,70 @@ public class LoadImage {
         editableWtfImage = wtfImage.edit();
         showImage();
     }
-    void showImage() {
-        /*if(editViewButton.isEditorVisible()) {
+    void showImage() throws InterruptedException {
+        if(editViewButton.isEditorVisible()) {
+            if(editableWtfImage.animationInformation().isAnimated()) {
+                showAnimatedImage(editableWtfImage);
+            }
             imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
             panel.add(imagePanel, BorderLayout.CENTER);
         } else {
+            if(wtfImage.animationInformation().isAnimated()) {
+                showAnimatedImage(wtfImage);
+            }
             imagePanel = new ImagePanel(wtfImage.asJavaImage());
             panel.add(imagePanel, BorderLayout.CENTER);
-        }*/
-        imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
-        panel.add(imagePanel, BorderLayout.CENTER);
+        }
+        //todo zurückstellen
+        /*imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
+        panel.add(imagePanel, BorderLayout.CENTER);*/
+
         panel.revalidate();
         panel.repaint();
+    }
+    boolean unsavedWarning() {
+        int choice = JOptionPane.showOptionDialog(
+                null,
+                "You have not saved your current image yet",
+                "Note",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                new Object[]{"Return", "Okay"},
+                "Return"
+        );
+        return choice == 0;
+    }
+    void showAnimatedImage(WtfImage image) throws InterruptedException {
+        Visible.setInvisible(editViewButton.getEditor());
+        int seconds = 0;
+        int frames = 0;
+        long duration = 0;
+        if(image.animationInformation().isFpsCoded()) {
+            frames = image.animationInformation().framesPerSecond();
+            duration = 1000 / frames;
+        } else {
+            seconds = image.animationInformation().secondsPerFrame();
+            duration =seconds * 1000L;
+        }
+
+        long start = System.currentTimeMillis();
+        int i = 0;
+        panel.add(imagePanel, BorderLayout.CENTER);
+        while(System.currentTimeMillis() - start > 30000) {
+            if(i == image.animationInformation().frames()) {
+                i = 0;
+            }
+            TimeUnit.MILLISECONDS.sleep(duration);
+            if(editViewButton.isEditorVisible()) {
+                imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(i).asJavaImage());
+            } else {
+                imagePanel = new ImagePanel(wtfImage.animationInformation().frame(i).asJavaImage());
+            }
+            panel.revalidate();
+            panel.repaint();
+            i++;
+        }
+
     }
 }

@@ -206,10 +206,10 @@ public class FunctionMenu {
 
     }
     boolean hasExistingImage() {
-        if(panelNorth.loadImage.imagePanel!= null) {
-            return true;
+        if(panelNorth.loadImage.imagePanel== null) {
+            return false;
         }
-        return false;
+        return true;
     }
     void repaintImage() {
         panelNorth.loadImage.panel.revalidate();

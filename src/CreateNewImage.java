@@ -107,22 +107,23 @@ public class CreateNewImage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(selectedColorSpace!= null) {
-
-                    //testing if the correct Colorspace gets saved:
-                    //System.out.println(selectedColorSpace.name());
                     loadImage.panel.remove(colorSpacePanel);
                     if(loadImage.editViewButton.isEditorVisible()) {
                         Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer(), loadImage.editViewButton.panelNorth.editorMenuBar);
                     } else {
                         Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getEditor());
                     }
-                    loadImage.onCreateNewImageDone(
-                            (int)integerValueSpinner[1].getValue(),
-                            (int)integerValueSpinner[2].getValue(),
-                            (int)integerValueSpinner[5].getValue(),
-                            (int)integerValueSpinner[6].getValue(),
-                            (int)integerValueSpinner[9].getValue(),
-                            (int)integerValueSpinner[10].getValue(), selectedColorSpace);
+                    try {
+                        loadImage.onCreateNewImageDone(
+                                (int)integerValueSpinner[1].getValue(),
+                                (int)integerValueSpinner[2].getValue(),
+                                (int)integerValueSpinner[5].getValue(),
+                                (int)integerValueSpinner[6].getValue(),
+                                (int)integerValueSpinner[9].getValue(),
+                                (int)integerValueSpinner[10].getValue(), selectedColorSpace);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     loadImage.panel.revalidate();
                     loadImage.panel.repaint();
                 }
