@@ -95,7 +95,7 @@ public class LoadImage {
         });
     }
     private void addPathItem() {
-        byPath = new JMenuItem("by path");
+        byPath = new JMenuItem("WTF by path");
         loadImage.add(byPath);
         byPath.setBackground(Colors.ITEMSPRIMARY);
         byPath.addActionListener(new ActionListener() {
@@ -119,8 +119,6 @@ public class LoadImage {
                 } else {
                     Visible.setVisible(saveButton, editViewButton.getEditor());
                 }
-                //editableWtfImage = wtfImage.edit();
-                // auch wenn WTFImage gezeigt wird, wird doch immer auch EditableWTFImage gespeichert, damit man immer gleich bei Änderungen zu diesem wechseln kann
                 try {
                     showImage();
                 } catch (InterruptedException ex) {
@@ -331,7 +329,7 @@ public class LoadImage {
             imagePanel.revalidate();
             imagePanel.repaint();
             i[0] = i[0]+1;
-            if(i[0] == editableWtfImage.animationInformation().frames()) {
+            if(i[0] == image.animationInformation().frames()) {
                 i[0] = 0;
             }
         });
