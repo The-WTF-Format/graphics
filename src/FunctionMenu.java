@@ -82,7 +82,7 @@ public class FunctionMenu {
         generalMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         generalMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
-        addMenuItem(generalMenu, "Höhe und Größe ändern");
+        addMenuItem(generalMenu, "Change height and width");
         // Code probieren obs klappt
         /*JMenuItem height = addMenuItem(generalMenu, "Höhe und Größe ändern");
         height.addActionListener(new ActionListener() {
@@ -149,6 +149,8 @@ public class FunctionMenu {
                         case "Select color space":
                             functionMenu.colorSpaceSelection();
                             break;
+                        case "Change heigth and width":
+                            functionMenu.changeWTFImageHeight();
                         default:
                             System.out.println("Unbekannte Aktion: " + name);
                     }
@@ -222,11 +224,11 @@ public class FunctionMenu {
     //How to change WTFImage:
     //z.B. Change Height
     // klappt leider noch nicht
-    /*void changeWTFImageHeight() {
+    void changeWTFImageHeight() {
         panelNorth.loadImage.getEditableWtfImage().setHeight(10);
         Image newImage = panelNorth.loadImage.editableWtfImage.asJavaImage();
         panelNorth.loadImage.setImagePanel(newImage);
         panelNorth.loadImage.imagePanel.setImage(newImage);
-    }*/
+    }
 
 }
