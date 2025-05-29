@@ -252,6 +252,9 @@ public class LoadImage {
         showImage();
     }
     void showImage() throws InterruptedException {
+        if (imagePanel != null) {
+            panel.remove(imagePanel);
+        }
         if(editViewButton.isEditorVisible()) {
             if(editableWtfImage.animationInformation().isAnimated()) {
                 showAnimatedImage(editableWtfImage);
@@ -346,4 +349,5 @@ public class LoadImage {
             }
         });
     }
+
 }

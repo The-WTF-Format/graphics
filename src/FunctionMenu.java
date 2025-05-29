@@ -54,8 +54,8 @@ public class FunctionMenu {
         animationMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
-        addMenuItem(animationMenu, "Frames einstellen");
-        addMenuItem(animationMenu, "Frames per second einstellen");
+        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Frames einstellen");
+        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Frames per second einstellen");
 
         menu.add(animationMenu);
     }
@@ -82,7 +82,7 @@ public class FunctionMenu {
         generalMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         generalMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
-        addMenuItem(generalMenu, "Change height and width");
+        addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Change height and width");
         // Code probieren obs klappt
         /*JMenuItem height = addMenuItem(generalMenu, "Höhe und Größe ändern");
         height.addActionListener(new ActionListener() {
@@ -92,8 +92,8 @@ public class FunctionMenu {
                 repaintImage();
             }
         });*/
-        addMenuItem(generalMenu, "Spiegeln");
-        addMenuItem(generalMenu, "Drehen");
+        addMenuItem(generalMenu, ActionRouter.createFunctionMenuActionRouter(this), "Spiegeln");
+        addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Drehen");
 
         menu.add(generalMenu);
     }
@@ -106,20 +106,22 @@ public class FunctionMenu {
         converterMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-        addMenuItem(converterMenu, "GIF");
-        addMenuItem(converterMenu, "JPEG");
-        addMenuItem(converterMenu, "PNG");
+        addMenuItem(converterMenu, ActionRouter.createFunctionMenuActionRouter(this), "GIF");
+        addMenuItem(converterMenu,  ActionRouter.createFunctionMenuActionRouter(this), "JPEG");
+        addMenuItem(converterMenu,  ActionRouter.createFunctionMenuActionRouter(this), "PNG");
 
         menu.add(converterMenu);
     }
 
     // PRIVAT FUNCTION
     //Hauptgruppe erstellen
-    private JMenuItem addMenuItem(JMenu menu, String text) {
+    private JMenuItem addMenuItem(JMenu menu, BiConsumer<JMenuItem, String> actionAssigner, String text) {
         JMenuItem item = new JMenuItem(text);
         //todo möglichkeit von erstellen einer MenuStyler - verschiedene Gruppen mit verschiedenen Aussehen?
         item.setBackground(Colors.ITEMSSECONDARY);
         menu.add(item);
+        //Action werden zugewiesen
+        actionAssigner.accept(item, text);
         return item;
     }
 
@@ -149,8 +151,10 @@ public class FunctionMenu {
                         case "Select color space":
                             functionMenu.colorSpaceSelection();
                             break;
-                        case "Change heigth and width":
+                        case "Change height and width":
                             functionMenu.changeWTFImageHeight();
+                            System.out.println("Button click");
+                            break;
                         default:
                             System.out.println("Unbekannte Aktion: " + name);
                     }
@@ -207,28 +211,38 @@ public class FunctionMenu {
 
 
     }
-    boolean hasExistingImage() {
-        if(panelNorth.loadImage.imagePanel== null) {
-            return false;
-        }
-        return true;
-    }
-    void repaintImage() {
-        panelNorth.loadImage.imagePanel.revalidate();
-        panelNorth.loadImage.imagePanel.repaint();
-        panelNorth.loadImage.panel.revalidate();
-        panelNorth.loadImage.panel.repaint();
-    }
+//    boolean hasExistingImage() {
+//        if(panelNorth.loadImage.imagePanel== null) {
+//            return false;
+//        }
+//        return true;
+//    }
+//    //Der Versuch ein Bild zu bearbeiten:
+//    // klappt leider noch nicht
 
-    //Hinweise:
-    //How to change WTFImage:
-    //z.B. Change Height
-    // klappt leider noch nicht
     void changeWTFImageHeight() {
-        panelNorth.loadImage.getEditableWtfImage().setHeight(10);
-        Image newImage = panelNorth.loadImage.editableWtfImage.asJavaImage();
-        panelNorth.loadImage.setImagePanel(newImage);
-        panelNorth.loadImage.imagePanel.setImage(newImage);
+        if (panelNorth == null || panelNorth.loadImage == null) {
+            System.out.println("no imagepanel loaded!");
+            return;
+        }
+
+        EditableWtfImage editable = panelNorth.loadImage.getEditableWtfImage();
+        if (editable == null) {
+            System.out.println("no image panel is loaded!");
+            return;
+        }
+
+        int newHeight = 10;
+        editable.setHeight(newHeight);
+        System.out.println("Neue Höhe: " + editable.height());
+
+        try {
+            // showImage kümmert sich um das Panel und alles andere
+            panelNorth.loadImage.showImage();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
+    //nicht ganz sicher, ob es in diesem Fall alle 4 braucht
 
 }
