@@ -1,21 +1,8 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.function.BiConsumer;
-
-import image.BufferedImagePanel;
-import image.ImagePanel;
 import values.Colors;
 import values.Size;
-import wtf.file.api.WtfImage;
-import wtf.file.api.color.ColorSpace;
 import wtf.file.api.editable.EditableWtfImage;
 
 //ähnlich aufgebaut wie LoadImage
@@ -25,7 +12,8 @@ public class FunctionMenu {
     JMenuBar menu;
     CreatePanel panel;
     JPanel mainPanel;
-    PanelNorth panelNorth;
+    static PanelNorth panelNorth;
+
     //Konstruktor
     FunctionMenu(JMenuBar menu, CreatePanel panel, JPanel mainPanel, PanelNorth panelNorth) {
         this.menu = menu;
@@ -54,8 +42,8 @@ public class FunctionMenu {
         animationMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
-        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Frames einstellen");
-        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Frames per second einstellen");
+        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Add Frames");
+        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Frames per second");
 
         menu.add(animationMenu);
     }
@@ -82,7 +70,7 @@ public class FunctionMenu {
         generalMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         generalMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
-        addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Change height and width");
+        addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Height and width");
         // Code probieren obs klappt
         /*JMenuItem height = addMenuItem(generalMenu, "Höhe und Größe ändern");
         height.addActionListener(new ActionListener() {
@@ -92,8 +80,8 @@ public class FunctionMenu {
                 repaintImage();
             }
         });*/
-        addMenuItem(generalMenu, ActionRouter.createFunctionMenuActionRouter(this), "Spiegeln");
-        addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Drehen");
+        addMenuItem(generalMenu, ActionRouter.createFunctionMenuActionRouter(this), "Mirror...");
+        addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Rotate...");
 
         menu.add(generalMenu);
     }
@@ -113,7 +101,36 @@ public class FunctionMenu {
         menu.add(converterMenu);
     }
 
-    // PRIVAT FUNCTION
+    //ActionRouter, der die Funktionen zu den Buttons zuweist
+    public static class ActionRouter {
+        //BiConsumer nimmt zwei Elemente entgegen und gibt keinen Rückgabe wert
+        //das Menüelement, was ausgewählt wird
+        //String, wie die Methode heißt
+        public static BiConsumer<JMenuItem, String> createFunctionMenuActionRouter(FunctionMenu functionMenu) {
+            ImageFunction imageFunction = new ImageFunction(panelNorth);
+            return (item, name) -> {
+                item.addActionListener(e -> {
+                    switch (name) {
+                        case "Select color space":
+                            imageFunction.colorSpaceSelection();
+                            break;
+                        case "Height and width":
+                            imageFunction.setEditableHeightWidth();
+//                            imageFunction.changeWTFImageHeight(10);
+//                            imageFunction.changeWTFImageWidth(10);
+                            break;
+                        case "Rotate...":
+                            imageFunction.rotateEditable();
+                            break;
+                        default:
+                            System.out.println("Unbekannte Aktion: " + name);
+                    }
+                });
+            };
+        }
+    }
+
+    // PRIVAT FUNCTION//
     //Hauptgruppe erstellen
     private JMenuItem addMenuItem(JMenu menu, BiConsumer<JMenuItem, String> actionAssigner, String text) {
         JMenuItem item = new JMenuItem(text);
@@ -138,111 +155,5 @@ public class FunctionMenu {
         }
         return subMenu;
     }
-
-    public static class ActionRouter {
-        //BiConsumer nimmt zwei Elemente entgegen und gibt keinen Rückgabe wert
-        //das Menüelement, was ausgewählt wird
-        //String, wie die Methode heißt
-
-        public static BiConsumer<JMenuItem, String> createFunctionMenuActionRouter(FunctionMenu functionMenu) {
-            return (item, name) -> {
-                item.addActionListener(e -> {
-                    switch (name) {
-                        case "Select color space":
-                            functionMenu.colorSpaceSelection();
-                            break;
-                        case "Change height and width":
-                            functionMenu.changeWTFImageHeight();
-                            System.out.println("Button click");
-                            break;
-                        default:
-                            System.out.println("Unbekannte Aktion: " + name);
-                    }
-                });
-            };
-        }
-    }
-
-    private void colorSpaceSelection() {
-        // TODO Beim Aufruf der Methode muss das Panel als PopUp dargestellt werden
-        //DONE JE
-        // Neues modales Pop-up (Dialogfenster)
-        JDialog dialog = new JDialog((Frame) null, "Farbraum auswählen", true);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-        // Hinweis: habe den Namen deines loaklen Panels verändert, da dieser das globale Panel überschreibt.
-        CreatePanel gridPanel = new CreatePanel();
-        gridPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
-        gridPanel.setLayout(new GridLayout(5,3));
-        // TODO anderer Layouttyp wäre vermütlich sinnvoller (z.B. Borderlayout und dann alle im selben Bereich hinzufügen),
-        //  da auf diese Art die komplette Fläche genutzt wird und sehr "packed" ausschaut.
-        ButtonGroup group = new ButtonGroup();
-        String [] names = new String[15];
-        JRadioButton [] buttons = new JRadioButton[15];
-        // TODO Namen von der Enumklasse extrahieren und dann mit einer Schleife zuweisen
-        names[0] = "RGB";
-        names[1] = "RGBa";
-        names[2] = "DYNAMIC_RGBa";
-        names[3] = "GRAY_SCALE";
-        names[4] = "GRAY_SCALE_A";
-        names[5] = "DYNAMIC_GRAY_SCALE_A";
-        names[6] = "CMY";
-        names[7] = "CMYa";
-        names[8] = "DYNAMIC_CMYa";
-        names[9] = "HSV";
-        names[10] = "HSVa";
-        names[11] = "DYNAMIC_HSVa";
-        names[12] = "YCbCr";
-        names[13] = "YCbCra";
-        names[14] = "DYNAMIC_YCbCra";
-        for(int i = 0; i < 15; i++){
-            buttons[i] = new JRadioButton(names[i]);
-            buttons[i].setMaximumSize(new Dimension(80, 30));
-            buttons[i].setMaximumSize(new Dimension(80, 30));
-            buttons[i].setPreferredSize(new Dimension(80, 30));
-            group.add(buttons[i]);
-            gridPanel.add(buttons[i]);
-        }
-        //mainPanel.add(gridPanel, BorderLayout.EAST);
-        dialog.getContentPane().add(gridPanel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-
-
-    }
-//    boolean hasExistingImage() {
-//        if(panelNorth.loadImage.imagePanel== null) {
-//            return false;
-//        }
-//        return true;
-//    }
-//    //Der Versuch ein Bild zu bearbeiten:
-//    // klappt leider noch nicht
-
-    void changeWTFImageHeight() {
-        if (panelNorth == null || panelNorth.loadImage == null) {
-            System.out.println("no imagepanel loaded!");
-            return;
-        }
-
-        EditableWtfImage editable = panelNorth.loadImage.getEditableWtfImage();
-        if (editable == null) {
-            System.out.println("no image panel is loaded!");
-            return;
-        }
-
-        int newHeight = 10;
-        editable.setHeight(newHeight);
-        System.out.println("Neue Höhe: " + editable.height());
-
-        try {
-            // showImage kümmert sich um das Panel und alles andere
-            panelNorth.loadImage.showImage();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    //nicht ganz sicher, ob es in diesem Fall alle 4 braucht
 
 }
