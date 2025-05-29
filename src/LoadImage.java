@@ -222,6 +222,8 @@ public class LoadImage {
                 } else {
                     Visible.setVisible(editViewButton.getEditor(), editViewButton.panelNorth.viewerMenuBar);
                 }
+                imagePanel.repaint();
+                imagePanel.revalidate();
                 imagePanel = null;
                 wtfImage = null;
                 editableWtfImage = null;
@@ -255,7 +257,7 @@ public class LoadImage {
         if (imagePanel != null) {
             panel.remove(imagePanel);
         }
-        if(editViewButton.isEditorVisible()) {
+        if(editableWtfImage != null) {
             if(editableWtfImage.animationInformation().isAnimated()) {
                 showAnimatedImage(editableWtfImage);
                 //imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
@@ -294,7 +296,7 @@ public class LoadImage {
         return choice == 0;
     }
     void showAnimatedImage(WtfImage image) throws InterruptedException {
-        Visible.setInvisible(editViewButton.getEditor());
+        Visible.setInvisible(saveButton, loadImage);
         int seconds = 0;
         int frames = 0;
         int duration = 0;
@@ -323,11 +325,7 @@ public class LoadImage {
         Timer timer = new Timer(duration, e -> {
             System.out.println(System.currentTimeMillis());
             Image next = null;
-            if(editViewButton.isEditorVisible()) {
-                next = editableWtfImage.animationInformation().frame(i[0]).asJavaImage();
-            } else {
-                next = wtfImage.animationInformation().frame(i[0]).asJavaImage();
-            }
+            next = wtfImage.animationInformation().frame(i[0]).asJavaImage();
             imagePanel.setImage(next);
             imagePanel.revalidate();
             imagePanel.repaint();
@@ -346,8 +344,14 @@ public class LoadImage {
                 imagePanel.revalidate();
                 panel.repaint();
                 panel.revalidate();
+                if(editViewButton.isEditorVisible()) {
+                    Visible.setInvisible(editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
+                    Visible.setVisible(saveButton, loadImage);
+                } else {
+                    Visible.setInvisible(editViewButton.getEditor());
+                    Visible.setVisible(saveButton, loadImage);
+                }
             }
         });
     }
-
 }
