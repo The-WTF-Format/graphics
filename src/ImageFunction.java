@@ -51,12 +51,16 @@ public class ImageFunction {
         // OK-Button
         JButton okButton = new JButton("Übernehmen");
         okButton.addActionListener(e -> {
+            //Abfrage ob editable bereits vorhanden, sonst anlegen
+            if(panelNorth.loadImage.editableWtfImage == null) {
+                panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+            }
             try {
                 int height = Integer.parseInt(heightField.getText().trim());
                 int width = Integer.parseInt(widthField.getText().trim());
 
                 //Methode aufrufen
-                changeWTFImageWidth(width);
+                //changeWTFImageWidth(width);
                 changeWTFImageHeight(height);
 
                 dialog.dispose();
@@ -140,8 +144,8 @@ public class ImageFunction {
 
     //private Methods
     protected void changeWTFImageHeight(int newHeight) {
-        editable.setHeight(newHeight);
-        System.out.println("Neue Höhe: " + editable.height());
+        panelNorth.loadImage.editableWtfImage.setHeight(newHeight);
+        System.out.println("Neue Höhe: " + panelNorth.loadImage.editableWtfImage.height());
         try {
             //Neues Bild muss ins Panel geladen werden
             panelNorth.loadImage.showImage();
@@ -152,7 +156,7 @@ public class ImageFunction {
 
     protected void changeWTFImageWidth(int newWidth) {
         //Höhe ändern
-        editable.setWidth(newWidth);
+        panelNorth.loadImage.editableWtfImage.setWidth(newWidth);
         System.out.println("Neue Höhe: " + editable.height());
         try {
             //Neues Bild muss ins Panel geladen werden
