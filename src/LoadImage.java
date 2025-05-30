@@ -27,6 +27,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
+
 
 public class LoadImage {
     JButton saveButton;
@@ -43,24 +45,32 @@ public class LoadImage {
     WtfImage wtfImage;
     WtfImageBuilder builder;
     EditableWtfImage editableWtfImage;
+    boolean loaded = false;
+
     LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
         this.panel = panel;
         this.editViewButton = editViewButton;
         addMenu();
     }
+
     void setImagePanel(Image image) {
         this.imagePanel = new ImagePanel(image);
     }
+
     void setEditableWtfImage(EditableWtfImage editableWtfImage) {
         this.editableWtfImage = editableWtfImage;
     }
+
     EditableWtfImage getEditableWtfImage() {
         return editableWtfImage;
     }
+
     ImagePanel getImagePanel() {
         return this.imagePanel;
     }
+
+
     private void addMenu() {
         loadImage = new JMenu("Load image");
         loadImage.setPreferredSize(Size.BUTTONSIZEMAINMENU);
@@ -70,11 +80,13 @@ public class LoadImage {
         addMenuItems();
         saveImage();
     }
+
     private void addMenuItems() {
         addPathItem();
         addCreateItem();
         getNormalImageByPath();
     }
+
     private void addCreateItem() {
         createNewImage = new JMenuItem("create new image");
         loadImage.add(createNewImage);
@@ -94,6 +106,7 @@ public class LoadImage {
             }
         });
     }
+
     private void addPathItem() {
         byPath = new JMenuItem("WTF by path");
         loadImage.add(byPath);
@@ -110,6 +123,7 @@ public class LoadImage {
                 Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
                 try {
                     wtfImage = WtfLoader.from(Objects.requireNonNull(getNewPath()));
+                    loaded = true;
                 } catch (WtfException | IOException ex) {
                     System.out.println(ex);
                 }
@@ -128,6 +142,7 @@ public class LoadImage {
             }
         });
     }
+
     private void getNormalImageByPath() {
         normalImage = new JMenuItem("get standard format Image");
         loadImage.add(normalImage);
@@ -151,7 +166,10 @@ public class LoadImage {
                 panel.repaint();
             }
         });
+        loaded = true;
+
     }
+
     private void getNewImage() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Bild auswählen");
@@ -161,14 +179,16 @@ public class LoadImage {
         //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
         if(result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            try{
+            try {
                 image = ImageIO.read(selectedFile);
-            } catch(Exception ex) {
+                loaded = true;
+            } catch (Exception ex) {
                 System.out.println("Error when reading Image: " + ex);
+                loaded = false;
             }
         }
-
     }
+
     private Path getNewPath() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Bild auswählen");
@@ -180,7 +200,9 @@ public class LoadImage {
         if(result == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile().toPath();
         }
+        loaded = true;
         return null;
+
     }
     private Path getSavingPath() {
         JFileChooser fileChooser = new JFileChooser();
@@ -295,6 +317,7 @@ public class LoadImage {
         );
         return choice == 0;
     }
+
     void showAnimatedImage(WtfImage image) throws InterruptedException {
         Visible.setInvisible(saveButton, loadImage);
         int seconds = 0;
@@ -354,4 +377,5 @@ public class LoadImage {
             }
         });
     }
+
 }

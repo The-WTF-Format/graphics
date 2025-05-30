@@ -85,7 +85,7 @@ public class ImageFunction {
         rotateRightButton.addActionListener(e -> {
             rotateRight();
         });
-        mainPanel.add(gridPanel, BorderLayout.EAST);
+        //mainPanel.add(gridPanel, BorderLayout.EAST);
 
 
     }

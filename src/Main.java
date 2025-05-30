@@ -30,10 +30,13 @@ public class Main {
 
         EditViewButton editViewButton = new EditViewButton(primaryMenu, panel, panelNorth);
         LoadImage loadImage = new LoadImage(primaryMenu, panel, editViewButton);
+        panelNorth.setImage(loadImage);
+
         primaryMenu.add(editViewButton.getViewer());
         primaryMenu.add(editViewButton.getEditor());
+
         frame.setJMenuBar(primaryMenu);
-        panelNorth.setImage(loadImage);
+
     }
     public static PanelNorth setPanel(JFrame frame, JPanel panel) {
         panel.setLayout(new BorderLayout());

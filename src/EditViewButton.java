@@ -89,9 +89,15 @@ public class EditViewButton {
         editor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (panelNorth.editorMenuBar == null) {
+                    JOptionPane.showMessageDialog(null, "Bitte zuerst ein Bild laden!", "Editor nicht verfügbar", JOptionPane.WARNING_MESSAGE);
+                    return; // beende Action
+                }
+
                 Visible.setInvisible(editor, panelNorth.viewerMenuBar);
                 Visible.setVisible(viewer, panelNorth.editorMenuBar);
                 editorOfficiallyVisible = true;
+
                 panel.remove(panelNorth.viewerMenuBar);
                 panel.add(panelNorth.editorMenuBar, BorderLayout.NORTH);
                 panel.revalidate();

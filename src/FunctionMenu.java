@@ -21,11 +21,11 @@ public class FunctionMenu {
         this.mainPanel = mainPanel;
         this.panelNorth = panelNorth;
         addMenus();
-    }
+       }
 
     // GENERAL //
     //addMenus - hier kann die Reihenfolge noch geändert werden
-    private void addMenus() {
+    void addMenus() {
         addAnimationMenu();
         addColorMenu();
         addGeneral();
