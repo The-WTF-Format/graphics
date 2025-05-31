@@ -47,7 +47,7 @@ public class FunctionMenu {
         animationMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Add Frames");
+        addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Seconds per frame");
         addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Frames per second");
 
         menu.add(animationMenu);
@@ -135,6 +135,12 @@ public class FunctionMenu {
                             break;
                         case "Rotate...":
                             imageFunction.rotateEditable();
+                            break;
+                        case "Seconds per frame":
+                            imageFunction.secondsPerFrames();
+                            break;
+                        case "Frames per second":
+                            imageFunction.framesPerSeconds();
                             break;
                         default:
                             System.out.println("Unbekannte Aktion: " + name);

@@ -4,6 +4,8 @@ import wtf.file.api.editable.data.EditablePixel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class ImageFunction {
@@ -151,6 +153,7 @@ public class ImageFunction {
         try {
             //Neues Bild muss ins Panel geladen werden
             panelNorth.loadImage.showImage();
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -180,6 +183,59 @@ public class ImageFunction {
         int height = editable.height();
         EditablePixel[][] original = editable.pixels();
         System.out.println(original);
+    }
+    protected void secondsPerFrames() {
+        frames("Seconds per frame", "Seconds per frame (0 - 127)");
+    }
+    protected void framesPerSeconds() {
+        frames("Frames per seconds", "Frames per seconds (0 - 127)");
+    }
+    private void frames(String header, String text) {
+        JDialog dialog = new JDialog((Frame) null, header, true);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setSize(400, 200);
+        dialog.setLayout(new BorderLayout());
+
+        // Panel für Eingabefelder
+        JPanel inputPanel = new JPanel(new GridLayout(1, 2, 10, 50));
+        JLabel label = new JLabel(text);
+        JSpinner spinner = new JSpinner();
+        inputPanel.add(label);
+        inputPanel.add(spinner);
+
+        // OK-Button
+        JButton okButton = new JButton("Okay");
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if((int) spinner.getValue() < 0 || (int) spinner.getValue() > 127) {
+                    JOptionPane.showMessageDialog(null, "Please enter a value between 0 and 127!", "Invalid Value", JOptionPane.INFORMATION_MESSAGE);
+
+                } else {
+                    if(panelNorth.loadImage.editableWtfImage == null) {
+                        panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+                    }
+                    if(header.equals("Seconds per frame")) {
+                        panelNorth.loadImage.editableWtfImage.animationInformation().setSecondsPerFrame((int) spinner.getValue());
+                        System.out.println("Neue Seconds per frame: " + panelNorth.loadImage.editableWtfImage.animationInformation().secondsPerFrame());
+                    } else {
+                        panelNorth.loadImage.editableWtfImage.animationInformation().setFramesPerSecond((int) spinner.getValue());
+                        System.out.println("Neue Frames per second: " + panelNorth.loadImage.editableWtfImage.animationInformation().framesPerSecond());
+                    }
+                    dialog.dispose();
+                    try {
+                        panelNorth.loadImage.showImage();
+
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
+        dialog.add(inputPanel, BorderLayout.CENTER);
+        dialog.add(okButton, BorderLayout.SOUTH);
+        dialog.setLocationRelativeTo(null); // zentrieren
+        dialog.setVisible(true);
     }
 
 

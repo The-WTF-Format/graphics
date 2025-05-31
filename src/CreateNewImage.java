@@ -16,7 +16,7 @@ public class CreateNewImage {
     JLabel [] integerTextField = new JLabel[12];
     final int lowerBound = 1;
     final int [] upperBound = new int[] {0, 65535, 65535, -1, -1, 127, 127, 0, 0, 255, 16, 0};
-    final String [] integerText = new String []{"", "Width (1 - 65 535)", "Height (1 - 65 535)", "", "", "Seconds per frame (0 - 127)", "Frames per Seconds (0 - 127)", "", "", "Frames (1 - 255)", "Channel Width (1 - 16)", ""};
+    final String [] integerText = new String []{"", "Width (1 - 65 535)", "Height (1 - 65 535)", "", "", "Seconds per frame (0 - 127)", "Frames per seconds (0 - 127)", "", "", "Frames (1 - 255)", "Channel Width (1 - 16)", ""};
     JRadioButton [] colorSpaceButtons = new JRadioButton[15];
     JPanel [] integerValuePanels = new JPanel[12];
     JPanel [] colorSpacePanels = new JPanel[6];
@@ -148,7 +148,8 @@ public class CreateNewImage {
         dialog.setSize(450, 120);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        }
+
+    }
     void setColorSpace() {
         ButtonGroup buttonGroup = new ButtonGroup();
         ColorSpace[] colorspaces = ColorSpace.values();

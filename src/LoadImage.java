@@ -105,6 +105,8 @@ public class LoadImage {
                         Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
+                    } else {
+                        Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.animationMenu);
                     }
                     panel.remove(imagePanel);
                     imagePanel = null;
@@ -134,6 +136,8 @@ public class LoadImage {
                         Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
+                    } else {
+                        Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.animationMenu);
                     }
                     panel.remove(imagePanel);
                     imagePanel = null;
@@ -179,6 +183,8 @@ public class LoadImage {
                         Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
+                    } else {
+                        Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.animationMenu);
                     }
                     panel.remove(imagePanel);
                     imagePanel = null;
@@ -331,9 +337,18 @@ public class LoadImage {
         showImage();
     }
     void showImage() throws InterruptedException {
+        if(editableWtfImage != null && !wtfImage.edit().equals(editableWtfImage)) {
+            wtfImage = null;
+        }
         if (imagePanel != null) {
             panel.remove(imagePanel);
+            imagePanel = null;
+            image = null;
+            wtfImage = null;
+            editableWtfImage = null;
         }
+        panel.repaint();
+        panel.revalidate();
         if(editableWtfImage != null) {
             if(editableWtfImage.animationInformation().isAnimated()) {
                 Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
@@ -343,6 +358,7 @@ public class LoadImage {
                 //imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
                 //panel.add(imagePanel, BorderLayout.CENTER);
             } else {
+                Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.animationMenu);
                 imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
                 panel.add(imagePanel, BorderLayout.CENTER);
             }
@@ -352,16 +368,12 @@ public class LoadImage {
                             editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
                             editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
                 showAnimatedImage(wtfImage);
-                //imagePanel = new ImagePanel(wtfImage.animationInformation().frame(0).asJavaImage());
-                //panel.add(imagePanel, BorderLayout.CENTER);
             } else {
+                Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.animationMenu);
                 imagePanel = new ImagePanel(wtfImage.asJavaImage());
                 panel.add(imagePanel, BorderLayout.CENTER);
             }
         }
-        //todo zurückstellen
-        //imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
-        //panel.add(imagePanel, BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
     }
@@ -379,24 +391,24 @@ public class LoadImage {
         return choice == 0;
     }
 
-    void showAnimatedImage(WtfImage image) throws InterruptedException {
+    void showAnimatedImage(WtfImage localImage) throws InterruptedException {
         Visible.setInvisible(saveButton, loadImage);
         int seconds = 0;
         int frames = 0;
         int duration = 0;
-        if(image.animationInformation().isFpsCoded()) {
-            frames = image.animationInformation().framesPerSecond();
+        if(localImage.animationInformation().isFpsCoded()) {
+            frames = localImage.animationInformation().framesPerSecond();
             duration = 1000 / frames;
         } else {
-            seconds = image.animationInformation().secondsPerFrame();
+            seconds = localImage.animationInformation().secondsPerFrame();
             duration = seconds * 1000;
         }
-
-        if(editableWtfImage != null) {
+        imagePanel = new ImagePanel(localImage.animationInformation().frame(0).asJavaImage());
+        /*if(editableWtfImage != null) {
             imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
         } else {
             imagePanel = new ImagePanel(wtfImage.animationInformation().frame(0).asJavaImage());
-        }
+        }*/
         panel.add(imagePanel, BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
@@ -407,12 +419,18 @@ public class LoadImage {
         Timer timer = new Timer(duration, e -> {
             System.out.println(System.currentTimeMillis());
             Image next = null;
-            next = wtfImage.animationInformation().frame(i[0]).asJavaImage();
+
+            /*if(editableWtfImage != null) {
+                next = editableWtfImage.animationInformation().frame(i[0]).asJavaImage();
+            } else {
+                next = wtfImage.animationInformation().frame(i[0]).asJavaImage();
+            }*/
+            next = localImage.animationInformation().frame(i[0]).asJavaImage();
             imagePanel.setImage(next);
             imagePanel.revalidate();
             imagePanel.repaint();
             i[0] = i[0]+1;
-            if(i[0] == image.animationInformation().frames()) {
+            if(i[0] == localImage.animationInformation().frames()) {
                 i[0] = 0;
             }
         });
