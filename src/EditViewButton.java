@@ -13,11 +13,6 @@ public class EditViewButton {
     JButton viewer;
     JButton editor;
     Boolean editorOfficiallyVisible;
-
-    public boolean isEditorVisible() {
-        return editorOfficiallyVisible;
-    }
-
     public EditViewButton(JMenuBar menuBar, JPanel panel, PanelNorth panelNorth) {
         this.panel = panel;
         this.panelNorth = panelNorth;
@@ -26,6 +21,10 @@ public class EditViewButton {
         viewerButton();
         editorButton();
     }
+    public boolean isEditorVisible() {
+        return editorOfficiallyVisible;
+    }
+
     private void viewerButton() {
         viewer = new JButton("Switch to viewer");
         ImageIcon viewIcon = new ImageIcon(Main.class.getResource("/icons/view.png"));

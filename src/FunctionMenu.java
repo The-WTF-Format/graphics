@@ -13,6 +13,12 @@ public class FunctionMenu {
     CreatePanel panel;
     JPanel mainPanel;
     static PanelNorth panelNorth;
+    //TODO: HInweis:
+    //Um die verschiedenen Menus auf Invisible zu stellen benötigen wir globale Variablen, alternativ können mir auch ein JMenu Array erstellen, wenn dir das lieber ist
+    JMenu animationMenu;
+    JMenu colorMenu;
+    JMenu generalMenu;
+    JMenu converterMenu;
 
     //Konstruktor
     FunctionMenu(JMenuBar menu, CreatePanel panel, JPanel mainPanel, PanelNorth panelNorth) {
@@ -37,7 +43,7 @@ public class FunctionMenu {
 
     //Animation
     private void addAnimationMenu() {
-        JMenu animationMenu = new JMenu("Animation");
+        animationMenu = new JMenu("Animation");
         animationMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
@@ -50,7 +56,7 @@ public class FunctionMenu {
 
     //Color
     private void addColorMenu() {
-        JMenu colorMenu = new JMenu("Color");
+        colorMenu = new JMenu("Color");
         colorMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
@@ -65,7 +71,7 @@ public class FunctionMenu {
 
     //General
     private void addGeneral() {
-        JMenu generalMenu = new JMenu("General");
+        generalMenu = new JMenu("General");
         generalMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         generalMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         generalMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
@@ -88,7 +94,7 @@ public class FunctionMenu {
 
     //Converter
     private void addConverter() {
-        JMenu converterMenu = new JMenu("Format");
+        converterMenu = new JMenu("Format");
         // todo change one "General" to another String - this one could be called "format"
         //done
         converterMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);

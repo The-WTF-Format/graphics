@@ -11,6 +11,7 @@ import wtf.file.api.exception.WtfException;
 import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -19,6 +20,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,6 +48,7 @@ public class LoadImage {
     WtfImageBuilder builder;
     EditableWtfImage editableWtfImage;
     boolean loaded = false;
+    String standardFormat;
 
     LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
@@ -94,11 +97,20 @@ public class LoadImage {
         createNewImage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(imagePanel!= null) {
+                if(imagePanel != null) {
                     if (unsavedWarning()) {
                         return;
                     }
+                    if(wtfImage.animationInformation().isAnimated()) {
+                        Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
+                                editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
+                                editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
+                    }
                     panel.remove(imagePanel);
+                    imagePanel = null;
+                    image = null;
+                    wtfImage = null;
+                    editableWtfImage = null;
                 }
                 builder = WtfLoader.by();
                 Visible.setInvisible(byPath, createNewImage, saveButton, editViewButton.getEditor(), editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
@@ -118,7 +130,16 @@ public class LoadImage {
                     if (unsavedWarning()) {
                         return;
                     }
+                    if(wtfImage.animationInformation().isAnimated()) {
+                        Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
+                                editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
+                                editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
+                    }
                     panel.remove(imagePanel);
+                    imagePanel = null;
+                    image = null;
+                    wtfImage = null;
+                    editableWtfImage = null;
                 }
                 Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
                 try {
@@ -151,15 +172,24 @@ public class LoadImage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(imagePanel != null) {
+                    if (unsavedWarning()) {
+                        return;
+                    }
+                    if(wtfImage.animationInformation().isAnimated()) {
+                        Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
+                                editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
+                                editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
+                    }
                     panel.remove(imagePanel);
+                    imagePanel = null;
+                    image = null;
+                    wtfImage = null;
+                    editableWtfImage = null;
                 }
                 Visible.setInvisible(editViewButton.getViewer(), editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar);
                 getNewImage();
-                if(editViewButton.isEditorVisible()) {
-                    Visible.setVisible(saveButton, editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
-                } else {
-                    Visible.setVisible(saveButton, editViewButton.getEditor());
-                }
+                Visible.setVisible(saveButton);
+
                 imagePanel = new BufferedImagePanel(image);
                 panel.add(imagePanel, BorderLayout.CENTER);
                 panel.revalidate();
@@ -179,6 +209,8 @@ public class LoadImage {
         //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
         if(result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
+            standardFormat = selectedFile.getName().split("\\.")[1];
+            System.out.println(standardFormat);
             try {
                 image = ImageIO.read(selectedFile);
                 loaded = true;
@@ -205,6 +237,7 @@ public class LoadImage {
 
     }
     private Path getSavingPath() {
+        System.out.println("I am here!");
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Pfad auswählen");
         int result = fileChooser.showOpenDialog(panel);
@@ -229,16 +262,34 @@ public class LoadImage {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(editableWtfImage == null) {
-                    editableWtfImage = wtfImage.edit();
-                }
-                try {
-                    editableWtfImage.save(getSavingPath());
-                } catch (IOException | WtfException ex) {
-                    throw new RuntimeException(ex);
+                if(wtfImage!= null) {
+                    // saving a WTF Image
+                    if(editableWtfImage == null) {
+                        // initialize editableWTFImage if it does not exist yet
+                        editableWtfImage = wtfImage.edit();
+                    }
+                    try {
+                        editableWtfImage.save(getSavingPath());
+                    } catch (IOException | WtfException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    // normal Image formats
+                    File file = new File((getSavingPath().toString()) + "." +  standardFormat);
+                    try {
+                       ImageIO.write(image, standardFormat, file);
+                    } catch (Exception ex) {
+                        System.out.println("Error when saving Image: " + ex);
+                    }
+
                 }
                 panel.remove(imagePanel);
                 Visible.setInvisible(saveButton);
+                if(wtfImage.animationInformation().isAnimated()) {
+                    Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
+                            editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
+                            editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
+                }
                 if(editViewButton.isEditorVisible()) {
                     Visible.setVisible(editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar);
                 } else {
@@ -249,6 +300,7 @@ public class LoadImage {
                 imagePanel = null;
                 wtfImage = null;
                 editableWtfImage = null;
+                image = null;
                 panel.repaint();
                 panel.revalidate();
             }
@@ -281,6 +333,9 @@ public class LoadImage {
         }
         if(editableWtfImage != null) {
             if(editableWtfImage.animationInformation().isAnimated()) {
+                Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
+                            editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
+                            editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
                 showAnimatedImage(editableWtfImage);
                 //imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
                 //panel.add(imagePanel, BorderLayout.CENTER);
@@ -290,6 +345,9 @@ public class LoadImage {
             }
         } else {
             if(wtfImage.animationInformation().isAnimated()) {
+                Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
+                            editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
+                            editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
                 showAnimatedImage(wtfImage);
                 //imagePanel = new ImagePanel(wtfImage.animationInformation().frame(0).asJavaImage());
                 //panel.add(imagePanel, BorderLayout.CENTER);
@@ -331,9 +389,7 @@ public class LoadImage {
             duration = seconds * 1000;
         }
 
-        //long start = System.currentTimeMillis();
-
-        if(editViewButton.isEditorVisible()) {
+        if(editableWtfImage != null) {
             imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
         } else {
             imagePanel = new ImagePanel(wtfImage.animationInformation().frame(0).asJavaImage());

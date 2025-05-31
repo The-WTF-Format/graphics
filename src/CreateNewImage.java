@@ -97,7 +97,7 @@ public class CreateNewImage {
         });
     }
     void setConclude() {
-        JButton save = new JButton("save");
+        JButton save = new JButton("create");
         save.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         save.setMaximumSize(Size.BUTTONSIZEMAINMENU);
         save.setPreferredSize(Size.BUTTONSIZEMAINMENU);
