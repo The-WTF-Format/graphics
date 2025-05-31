@@ -86,10 +86,11 @@ public class CreateNewImage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loadImage.panel.remove(mainPanel);
+                Visible.setInvisible(loadImage.saveButton);
                 if(loadImage.editViewButton.isEditorVisible()) {
-                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getViewer(), loadImage.editViewButton.panelNorth.editorMenuBar);
+                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.editViewButton.getViewer(), loadImage.editViewButton.panelNorth.editorMenuBar);
                 } else {
-                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.saveButton, loadImage.editViewButton.getEditor());
+                    Visible.setVisible(loadImage.byPath, loadImage.createNewImage, loadImage.editViewButton.getEditor());
                 }
                 loadImage.panel.revalidate();
                 loadImage.panel.repaint();

@@ -237,7 +237,6 @@ public class LoadImage {
 
     }
     private Path getSavingPath() {
-        System.out.println("I am here!");
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Pfad auswählen");
         int result = fileChooser.showOpenDialog(panel);
@@ -269,7 +268,11 @@ public class LoadImage {
                         editableWtfImage = wtfImage.edit();
                     }
                     try {
-                        editableWtfImage.save(getSavingPath());
+                        System.out.println("I will ask for a path");
+                        Path path = getSavingPath();
+                        System.out.println("Got a Path");
+                        editableWtfImage.save(path);
+                        System.out.println("Saved this Image");
                     } catch (IOException | WtfException ex) {
                         throw new RuntimeException(ex);
                     }
