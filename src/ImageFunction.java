@@ -21,6 +21,7 @@ public class ImageFunction {
         }
         if (panelNorth != null) {
             if (panelNorth.loadImage != null) {
+                //todo delete -> editing this will not change the actual visible image
                 editable = panelNorth.loadImage.getEditableWtfImage();
             }
         }
@@ -55,6 +56,7 @@ public class ImageFunction {
             if(panelNorth.loadImage.editableWtfImage == null) {
                 panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
             }
+
             try {
                 int height = Integer.parseInt(heightField.getText().trim());
                 int width = Integer.parseInt(widthField.getText().trim());

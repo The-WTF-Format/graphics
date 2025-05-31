@@ -47,7 +47,6 @@ public class FunctionMenu {
         animationMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         animationMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-
         addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Add Frames");
         addMenuItem(animationMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Frames per second");
 
@@ -116,6 +115,15 @@ public class FunctionMenu {
             ImageFunction imageFunction = new ImageFunction(panelNorth);
             return (item, name) -> {
                 item.addActionListener(e -> {
+                    if(panelNorth.loadImage.wtfImage == null && panelNorth.loadImage.editableWtfImage == null) {
+                        //check if there is a loaded image visible and open pop-up to avoid Nullpointer
+                        JOptionPane optionPane = new JOptionPane("There is no WTF-Image you can edit!", JOptionPane.INFORMATION_MESSAGE);
+                        JDialog dialog = optionPane.createDialog("Note");
+                        dialog.setSize(450, 120);
+                        dialog.setLocationRelativeTo(null);
+                        dialog.setVisible(true);
+                        return;
+                    }
                     switch (name) {
                         case "Select color space":
                             imageFunction.colorSpaceSelection();
