@@ -11,7 +11,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/api-java.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/api-java-1.1.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

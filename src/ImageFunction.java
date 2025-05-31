@@ -14,8 +14,9 @@ public class ImageFunction {
     private EditableWtfImage editable;
     JPanel mainPanel;
 
-    public ImageFunction(PanelNorth panelNorth) {
+    public ImageFunction(PanelNorth panelNorth, JPanel mainPanel) {
         this.panelNorth = panelNorth;
+        this.mainPanel = mainPanel;
         //ToDo panel wird mit Null übergeben -> muss gefixt werden, sonst wird bild nicht übergeben
 
         if (panelNorth == null || panelNorth.loadImage == null) {
@@ -64,7 +65,7 @@ public class ImageFunction {
                 int width = Integer.parseInt(widthField.getText().trim());
 
                 //Methode aufrufen
-                //changeWTFImageWidth(width);
+                changeWTFImageWidth(width);
                 changeWTFImageHeight(height);
 
                 dialog.dispose();
@@ -82,19 +83,30 @@ public class ImageFunction {
 
     public void rotateEditable() {
         CreatePanel gridPanel = new CreatePanel();
-        gridPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
+        gridPanel.setLayout(new FlowLayout());
+        gridPanel.setBackground(Color.LIGHT_GRAY);
+        gridPanel.setPreferredSize(new Dimension(200, 50));
 
         JButton rotateLeftButton = new JButton("↶ Links");
         JButton rotateRightButton = new JButton("↷ Rechts");
 
-        rotateLeftButton.addActionListener(e -> {
-            rotateLeft();
-        });
-        rotateRightButton.addActionListener(e -> {
-            rotateRight();
-        });
-        //mainPanel.add(gridPanel, BorderLayout.EAST);
+        rotateLeftButton.addActionListener(e -> rotateLeft());
+        rotateRightButton.addActionListener(e -> rotateRight());
 
+        gridPanel.add(rotateLeftButton);
+        gridPanel.add(rotateRightButton);
+
+        if (mainPanel.getLayout() instanceof BorderLayout) {
+            BorderLayout layout = (BorderLayout) mainPanel.getLayout();
+            Component oldEast = layout.getLayoutComponent(BorderLayout.EAST);
+            if (oldEast != null) {
+                mainPanel.remove(oldEast);
+            }
+        }
+
+        mainPanel.add(gridPanel, BorderLayout.EAST);
+        mainPanel.revalidate();
+        mainPanel.repaint();
 
     }
 
@@ -172,18 +184,18 @@ public class ImageFunction {
     }
 
     protected void rotateRight() {
-        int width = editable.width();
-        int height = editable.height();
-        EditablePixel[][] original = editable.pixels();
+        EditablePixel[][] original = panelNorth.loadImage.editableWtfImage.pixels();
         System.out.println(original);
     }
 
     protected void rotateLeft() {
-        int width = editable.width();
-        int height = editable.height();
-        EditablePixel[][] original = editable.pixels();
+        EditablePixel[][] original = panelNorth.loadImage.editableWtfImage.pixels();
         System.out.println(original);
     }
+
+//    private EditableWtfImage loadEditable(){
+//        return panelNorth.loadImage.editableWtfImage;
+//    }
     protected void secondsPerFrames() {
         frames("Seconds per frame", "Seconds per frame (0 - 127)");
     }

@@ -11,7 +11,7 @@ import wtf.file.api.editable.EditableWtfImage;
 public class FunctionMenu {
     JMenuBar menu;
     CreatePanel panel;
-    JPanel mainPanel;
+    static JPanel mainPanel;
     static PanelNorth panelNorth;
     //TODO: HInweis:
     //Um die verschiedenen Menus auf Invisible zu stellen benötigen wir globale Variablen, alternativ können mir auch ein JMenu Array erstellen, wenn dir das lieber ist
@@ -112,7 +112,7 @@ public class FunctionMenu {
         //das Menüelement, was ausgewählt wird
         //String, wie die Methode heißt
         public static BiConsumer<JMenuItem, String> createFunctionMenuActionRouter(FunctionMenu functionMenu) {
-            ImageFunction imageFunction = new ImageFunction(panelNorth);
+            ImageFunction imageFunction = new ImageFunction(panelNorth, mainPanel);
             return (item, name) -> {
                 item.addActionListener(e -> {
                     if(panelNorth.loadImage.wtfImage == null && panelNorth.loadImage.editableWtfImage == null) {
