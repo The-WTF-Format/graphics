@@ -145,7 +145,7 @@ public class FunctionMenu {
                             imageFunction.framesPerSeconds();
                             break;
                         case "Invert Color":
-                            imageFunction.invertColor();
+                            imageFunction.invertColorPopUp();
                             break;
                         case "Color Picker":
                             imageFunction.colorPicker();
