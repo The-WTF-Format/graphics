@@ -1,4 +1,5 @@
 import values.Colors;
+import wtf.file.api.color.ColorSpace;
 import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.editable.data.EditablePixel;
 
@@ -13,6 +14,7 @@ public class ImageFunction {
     private final PanelNorth panelNorth;
     private EditableWtfImage editable;
     JPanel mainPanel;
+    ColorSpace selectedColorSpace;
 
     public ImageFunction(PanelNorth panelNorth, JPanel mainPanel) {
         this.panelNorth = panelNorth;
@@ -54,6 +56,7 @@ public class ImageFunction {
 
         // OK-Button
         JButton okButton = new JButton("Übernehmen");
+        //TODO: Bitte auf englisch übersetzten
         okButton.addActionListener(e -> {
             //Abfrage ob editable bereits vorhanden, sonst anlegen
             if(panelNorth.loadImage.editableWtfImage == null) {
@@ -70,6 +73,7 @@ public class ImageFunction {
 
                 dialog.dispose();
             } catch (NumberFormatException ex) {
+                //TODO: Bitte auf englisch übersetzten
                 JOptionPane.showMessageDialog(dialog, "Bitte gültige Zahlen eingeben!", "Fehler", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -89,7 +93,9 @@ public class ImageFunction {
 
         JButton rotateLeftButton = new JButton("↶ Links");
         JButton rotateRightButton = new JButton("↷ Rechts");
-
+        if(panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
         rotateLeftButton.addActionListener(e -> rotateLeft());
         rotateRightButton.addActionListener(e -> rotateRight());
 
@@ -111,51 +117,60 @@ public class ImageFunction {
     }
 
     protected void colorSpaceSelection() {
-        // TODO Beim Aufruf der Methode muss das Panel als PopUp dargestellt werden
-        //DONE JE
-        // Neues modales Pop-up (Dialogfenster)
-        JDialog dialog = new JDialog((Frame) null, "Farbraum auswählen", true);
+        JDialog dialog = new JDialog((Frame) null, "Choose colorspace", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-        // Hinweis: habe den Namen deines loaklen Panels verändert, da dieser das globale Panel überschreibt.
+        dialog.setPreferredSize(new Dimension(600, 220));
+        dialog.setMaximumSize(new Dimension(600, 220));
+        dialog.setMinimumSize(new Dimension(600, 220));
         CreatePanel gridPanel = new CreatePanel();
         gridPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
-        gridPanel.setLayout(new GridLayout(5,3));
-        // TODO anderer Layouttyp wäre vermütlich sinnvoller (z.B. Borderlayout und dann alle im selben Bereich hinzufügen),
-        //  da auf diese Art die komplette Fläche genutzt wird und sehr "packed" ausschaut.
+        gridPanel.setLayout(new GridLayout(6,3));
         ButtonGroup group = new ButtonGroup();
-        String [] names = new String[15];
         JRadioButton [] buttons = new JRadioButton[15];
-        // TODO Namen von der Enumklasse extrahieren und dann mit einer Schleife zuweisen
-        names[0] = "RGB";
-        names[1] = "RGBa";
-        names[2] = "DYNAMIC_RGBa";
-        names[3] = "GRAY_SCALE";
-        names[4] = "GRAY_SCALE_A";
-        names[5] = "DYNAMIC_GRAY_SCALE_A";
-        names[6] = "CMY";
-        names[7] = "CMYa";
-        names[8] = "DYNAMIC_CMYa";
-        names[9] = "HSV";
-        names[10] = "HSVa";
-        names[11] = "DYNAMIC_HSVa";
-        names[12] = "YCbCr";
-        names[13] = "YCbCra";
-        names[14] = "DYNAMIC_YCbCra";
-        for(int i = 0; i < 15; i++){
-            buttons[i] = new JRadioButton(names[i]);
-            buttons[i].setMaximumSize(new Dimension(80, 30));
-            buttons[i].setMaximumSize(new Dimension(80, 30));
-            buttons[i].setPreferredSize(new Dimension(80, 30));
-            group.add(buttons[i]);
-            gridPanel.add(buttons[i]);
+        ColorSpace[] colorspaces = ColorSpace.values();
+
+        JButton okButton = new JButton("Okay");
+        gridPanel.add(okButton);
+        for(int i = 0; i < 18; i++){
+            if(i < 15) {
+                buttons[i] = new JRadioButton(colorspaces[i].name());
+                buttons[i].setMaximumSize(new Dimension(80, 30));
+                buttons[i].setMaximumSize(new Dimension(80, 30));
+                buttons[i].setPreferredSize(new Dimension(80, 30));
+                group.add(buttons[i]);
+                gridPanel.add(buttons[i]);
+                buttons[i].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JRadioButton source = (JRadioButton) e.getSource();
+                        selectedColorSpace = ColorSpace.valueOf(source.getText());
+                    }
+                });
+            } else if(i == 16) {
+                gridPanel.add(okButton);
+            } else {
+                gridPanel.add(new JPanel());
+            }
         }
-        //mainPanel.add(gridPanel, BorderLayout.EAST);
+        okButton.addActionListener(e -> {
+            if(selectedColorSpace == null) {
+                return;
+            }
+            if(panelNorth.loadImage.editableWtfImage == null) {
+                panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+            }
+            panelNorth.loadImage.editableWtfImage.setColorSpace(selectedColorSpace);
+            dialog.dispose();
+            try {
+                panelNorth.loadImage.showImage();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         dialog.getContentPane().add(gridPanel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-
     }
 
     //private Methods
@@ -174,7 +189,7 @@ public class ImageFunction {
     protected void changeWTFImageWidth(int newWidth) {
         //Höhe ändern
         panelNorth.loadImage.editableWtfImage.setWidth(newWidth);
-        System.out.println("Neue Höhe: " + editable.height());
+        System.out.println("Neue Höhe: " + panelNorth.loadImage.editableWtfImage.height());
         try {
             //Neues Bild muss ins Panel geladen werden
             panelNorth.loadImage.showImage();
