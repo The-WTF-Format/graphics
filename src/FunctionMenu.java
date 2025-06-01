@@ -150,6 +150,8 @@ public class FunctionMenu {
                         case "Color Picker":
                             imageFunction.colorPicker();
                             break;
+                        case "Mirror...":
+                            imageFunction.mirrorEditable();
                         default:
                             System.out.println("Unbekannte Aktion: " + name);
                     }

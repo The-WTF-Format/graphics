@@ -1,4 +1,3 @@
-import image.ImagePanel;
 import values.Colors;
 import wtf.file.api.color.ColorSpace;
 import wtf.file.api.color.channel.ColorChannel;
@@ -6,12 +5,11 @@ import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.editable.data.EditablePixel;
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class ImageFunction {
@@ -26,6 +24,7 @@ public class ImageFunction {
     public ImageFunction(PanelNorth panelNorth, JPanel mainPanel) {
         this.panelNorth = panelNorth;
         this.mainPanel = mainPanel;
+
         //ToDo panel wird mit Null übergeben -> muss gefixt werden, sonst wird bild nicht übergeben
 
         if (panelNorth == null || panelNorth.loadImage == null) {
@@ -42,6 +41,7 @@ public class ImageFunction {
         }
     }
 
+    //-----------Funktionen für FUnction Menu-------------//
     public void setEditableHeightWidth() {
         //neues Fenster erstellen
         JDialog dialog = new JDialog((Frame) null, "Höhe und Breite ändern", true);
@@ -93,35 +93,45 @@ public class ImageFunction {
     }
 
     public void rotateEditable() {
+        showTransformationPanel(
+                TransformationType.ROTATE_COUNTERCLOCKWISE,
+                TransformationType.ROTATE_CLOCKWISE
+        );
+    }
+
+    public void mirrorEditable() {
+        showTransformationPanel(
+                TransformationType.FLIP_HORIZONTAL,
+                TransformationType.FLIP_VERTICAL
+        );
+    }
+
+    // ----------Methoden zum Panel herzeigen----------//
+    protected void showTransformationPanel(TransformationType... transformations) {
         CreatePanel gridPanel = new CreatePanel();
         gridPanel.setLayout(new FlowLayout());
         gridPanel.setBackground(Color.LIGHT_GRAY);
         gridPanel.setPreferredSize(new Dimension(200, 50));
 
-        JButton rotateLeftButton = new JButton("↶ Links");
-        JButton rotateRightButton = new JButton("↷ Rechts");
         if(panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
         }
-        rotateLeftButton.addActionListener(e -> rotateLeft());
-        rotateRightButton.addActionListener(e -> rotateRight());
 
-        gridPanel.add(rotateLeftButton);
-        gridPanel.add(rotateRightButton);
-
-        if (mainPanel.getLayout() instanceof BorderLayout) {
-            BorderLayout layout = (BorderLayout) mainPanel.getLayout();
-            Component oldEast = layout.getLayoutComponent(BorderLayout.EAST);
-            if (oldEast != null) {
-                mainPanel.remove(oldEast);
-            }
+        // Buttons basierend auf den übergebenen Transformationen erstellen
+        for (TransformationType transformation : transformations) {
+            JButton button = createTransformationButton(transformation);
+            gridPanel.add(button);
         }
 
-        mainPanel.add(gridPanel, BorderLayout.EAST);
-        mainPanel.revalidate();
-        mainPanel.repaint();
+        JButton closeButton = new JButton("✕ Schließen");
+        closeButton.addActionListener(e -> closePanelInEast());
+        gridPanel.add(closeButton);
 
+        // Panel anzeigen
+        showPanelInEast(gridPanel);
     }
+
+
 
     protected void colorSpaceSelection() {
         JDialog dialog = new JDialog((Frame) null, "Choose colorspace", true);
@@ -180,7 +190,8 @@ public class ImageFunction {
         dialog.setVisible(true);
     }
 
-    //private Methods
+    //------------private Methods----------------//
+    //Transform
     protected void changeWTFImageHeight(int newHeight) {
         panelNorth.loadImage.editableWtfImage.setHeight(newHeight);
         System.out.println("Neue Höhe: " + panelNorth.loadImage.editableWtfImage.height());
@@ -205,19 +216,83 @@ public class ImageFunction {
         }
     }
 
-    protected void rotateRight() {
-        EditablePixel[][] original = panelNorth.loadImage.editableWtfImage.pixels();
-        System.out.println(original);
+    protected void transform(TransformationType type) {
+        if (panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+
+        try {
+            EditablePixel[][] original = panelNorth.loadImage.editableWtfImage.pixels();
+            int width = original[0].length;
+            int height = original.length;
+
+            //Temporärer Map für ColorChannel
+            Map<ColorChannel, Short>[][] tempValues = new Map[height][width];
+
+            //Alle Pixel-Werte in temporäres Array kopieren MIT Default-Werten
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    Map<ColorChannel, Short> originalValues = original[y][x].values();
+                    Map<ColorChannel, Short> completeValues = new HashMap<>();
+
+                    // Alle Original-Werte kopieren
+                    completeValues.putAll(originalValues);
+
+                    // Fehlende HSV-Kanäle mit Default-Werten ergänzen
+                    ensureHSVChannels(completeValues);
+
+                    tempValues[y][x] = completeValues;
+                }
+            }
+
+            //Rotierte Werte zurück in die Pixel schreiben
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int newY, newX;
+
+                    switch (type) {
+                        case ROTATE_CLOCKWISE:
+                            // 90° rechts: (x,y) -> (y, width-1-x)
+                            newY = x;
+                            newX = height - 1 - y;
+                            break;
+
+                        case ROTATE_COUNTERCLOCKWISE:
+                            // 90° links: (x,y) -> (height-1-x, y)
+                            newY = width - 1 - x;
+                            newX = y;
+                            break;
+
+                        case FLIP_HORIZONTAL:
+                            // Horizontal spiegeln: (x,y) -> (width-1-x, y)
+                            newY = y;
+                            newX = width - 1 - x;
+                            break;
+
+                        case FLIP_VERTICAL:
+                            // Vertikal spiegeln: (x,y) -> (x, height-1-y)
+                            newY = height - 1 - y;
+                            newX = x;
+                            break;
+
+                        default:
+                            throw new IllegalArgumentException("Unknown transformation: " + type);
+                    }
+
+                    if (newY >= 0 && newY < height && newX >= 0 && newX < width) {
+                        original[newY][newX].setValues(tempValues[y][x]);
+                    }
+                }
+            }
+            panelNorth.loadImage.showImage();
+
+        } catch (Exception e) {
+            System.err.println("ERROR: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    protected void rotateLeft() {
-        EditablePixel[][] original = panelNorth.loadImage.editableWtfImage.pixels();
-        System.out.println(original);
-    }
-
-//    private EditableWtfImage loadEditable(){
-//        return panelNorth.loadImage.editableWtfImage;
-//    }
+    //Animiation
     protected void secondsPerFrames() {
         frames("Seconds per frame", "Seconds per frame (0 - 127)");
     }
@@ -271,6 +346,8 @@ public class ImageFunction {
         dialog.setLocationRelativeTo(null); // zentrieren
         dialog.setVisible(true);
     }
+
+    //Color
     protected void invertColor() {
         if(panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
@@ -387,6 +464,97 @@ public class ImageFunction {
         mainPanel.repaint();
 
     }
+
+    //-------------------Hilfefunktionen für NullWerte im Channels----------------//
+    //manche Pixel können null Werte im ColorChannel haben - Probleme mit Java-Image dann beim Darstellen
+    //Funktion sucht null Werte und ersetzt sie mit sinnevolle Deafult Werte
+    private void ensureHSVChannels(Map<ColorChannel, Short> values) {
+        // Suche nach HSV-Kanälen (DynamicColorChannel) welche gibt es überhaupt
+        ColorChannel hueChannel = null;
+        ColorChannel saturationChannel = null;
+        ColorChannel valueChannel = null;
+        ColorChannel alphaChannel = null;
+
+        for (ColorChannel channel : values.keySet()) {
+            String name = channel.toString().toLowerCase();
+            if (name.contains("hue")) {
+                hueChannel = channel;
+            } else if (name.contains("saturation")) {
+                saturationChannel = channel;
+            } else if (name.contains("value")) {
+                valueChannel = channel;
+            } else if (name.contains("alpha")) {
+                alphaChannel = channel;
+            }
+        }
+
+        // Default-Werte setzen falls Kanäle fehlen
+        if (hueChannel != null && values.get(hueChannel) == null) {
+            values.put(hueChannel, (short) 0); // Default Hue = 0 (rot)
+        }
+        if (saturationChannel != null && values.get(saturationChannel) == null) {
+            values.put(saturationChannel, (short) 0); // Default Saturation = 0 (grau)
+        }
+        if (valueChannel != null && values.get(valueChannel) == null) {
+            values.put(valueChannel, (short) 255); // Default Value = 255 (hell)
+        }
+        if (alphaChannel != null && values.get(alphaChannel) == null) {
+            values.put(alphaChannel, (short) 255); // Default Alpha = 255 (undurchsichtig)
+        }
+    }
+
+    //----------------- Hilfsmethode für Panel-Management------------------//
+    private void showPanelInEast(JPanel panel) {
+        if (mainPanel.getLayout() instanceof BorderLayout) {
+            BorderLayout layout = (BorderLayout) mainPanel.getLayout();
+            Component oldEast = layout.getLayoutComponent(BorderLayout.EAST);
+            if (oldEast != null) {
+                mainPanel.remove(oldEast);
+            }
+        }
+
+        mainPanel.add(panel, BorderLayout.EAST);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    //------------------Hilfsmethode um Buttons zu erstellen----------------------//
+    private JButton createTransformationButton(TransformationType transformation) {
+        String text;
+        switch (transformation) {
+            case ROTATE_CLOCKWISE:
+                text = "↷ Rechts";
+                break;
+            case ROTATE_COUNTERCLOCKWISE:
+                text = "↶ Links";
+                break;
+            case FLIP_HORIZONTAL:
+                text = "↔ Horizontal";
+                break;
+            case FLIP_VERTICAL:
+                text = "↕ Vertikal";
+                break;
+            default:
+                text = transformation.toString();
+        }
+
+        JButton button = new JButton(text);
+        button.addActionListener(e -> transform(transformation));
+        return button;
+    }
+
+    private void closePanelInEast() {
+        if (mainPanel.getLayout() instanceof BorderLayout) {
+            BorderLayout layout = (BorderLayout) mainPanel.getLayout();
+            Component eastPanel = layout.getLayoutComponent(BorderLayout.EAST);
+            if (eastPanel != null) {
+                mainPanel.remove(eastPanel);
+                mainPanel.revalidate();
+                mainPanel.repaint();
+            }
+        }
+    }
+
 
 
 
