@@ -59,12 +59,14 @@ public class FunctionMenu {
         colorMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-        // todo wir benötigen diese Components jeweils als eigenständige Objekte mit Zugriff
         //z.B.
-        colorMenu.add(createSubMenu("Color Picker", ActionRouter.createFunctionMenuActionRouter(this),"Farbname & Hexadezimalcode"));
-        colorMenu.add(createSubMenu("Farbe invertieren", ActionRouter.createFunctionMenuActionRouter(this),"Komplementärfarbe"));
+        /*colorMenu.add(createSubMenu("Color Picker", ActionRouter.createFunctionMenuActionRouter(this),"Farbname & Hexadezimalcode"));
+        colorMenu.add(createSubMenu("Invert Color", ActionRouter.createFunctionMenuActionRouter(this),"Komplementärfarbe"));
         colorMenu.add(createSubMenu("Color Space", ActionRouter.createFunctionMenuActionRouter(this),"Select color space"));
-
+        */
+        addMenuItem(colorMenu, ActionRouter.createFunctionMenuActionRouter(this), "Color Picker");
+        addMenuItem(colorMenu, ActionRouter.createFunctionMenuActionRouter(this), "Invert Color");
+        addMenuItem(colorMenu, ActionRouter.createFunctionMenuActionRouter(this), "Color Space");
         menu.add(colorMenu);
     }
 
@@ -125,7 +127,7 @@ public class FunctionMenu {
                         return;
                     }
                     switch (name) {
-                        case "Select color space":
+                        case "Color Space":
                             imageFunction.colorSpaceSelection();
                             break;
                         case "Height and width":
@@ -141,6 +143,12 @@ public class FunctionMenu {
                             break;
                         case "Frames per second":
                             imageFunction.framesPerSeconds();
+                            break;
+                        case "Invert Color":
+                            imageFunction.invertColor();
+                            break;
+                        case "Color Picker":
+                            imageFunction.colorPicker();
                             break;
                         default:
                             System.out.println("Unbekannte Aktion: " + name);

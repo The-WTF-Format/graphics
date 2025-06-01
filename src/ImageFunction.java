@@ -1,12 +1,17 @@
+import image.ImagePanel;
 import values.Colors;
 import wtf.file.api.color.ColorSpace;
+import wtf.file.api.color.channel.ColorChannel;
 import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.editable.data.EditablePixel;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 
 public class ImageFunction {
@@ -15,6 +20,8 @@ public class ImageFunction {
     private EditableWtfImage editable;
     JPanel mainPanel;
     ColorSpace selectedColorSpace;
+    JSpinner widthPicker;
+    JSpinner heightPicker;
 
     public ImageFunction(PanelNorth panelNorth, JPanel mainPanel) {
         this.panelNorth = panelNorth;
@@ -264,6 +271,78 @@ public class ImageFunction {
         dialog.setLocationRelativeTo(null); // zentrieren
         dialog.setVisible(true);
     }
+    protected void invertColor() {
+
+    }
+    protected void colorPicker() {
+        System.out.println("here");
+        if(panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+        CreatePanel colorPickerPanel = new CreatePanel();
+        colorPickerPanel.setPreferredSize(new Dimension(200, 50));
+        colorPickerPanel.setLayout(new GridLayout(8, 1));
+        colorPickerPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
+
+        JLabel label1 = new JLabel("Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
+                + " x "
+                + panelNorth.loadImage.editableWtfImage.height());
+        JLabel widthText = new JLabel("width");
+        widthPicker = new JSpinner();
+        JLabel heightText = new JLabel("height");
+        heightPicker = new JSpinner();
+        colorPickerPanel.add(label1);
+        colorPickerPanel.add(widthText);
+        colorPickerPanel.add(widthPicker);
+        colorPickerPanel.add(heightText);
+        colorPickerPanel.add(heightPicker);
+
+        JButton okButton = new JButton("Okay");
+        colorPickerPanel.add(okButton);
+        okButton.addActionListener( x ->  {
+            if((int)widthPicker.getValue() < 1
+                    || (int)widthPicker.getValue() > panelNorth.loadImage.wtfImage.width()
+                    || (int)heightPicker.getValue() < 1
+                    || (int)heightPicker.getValue() > panelNorth.loadImage.wtfImage.height()) {
+                JOptionPane optionPane = new JOptionPane("The width values have to be between 1 and" + panelNorth.loadImage.wtfImage.width()
+                        + "\nThe height values have to be between 1 and" + panelNorth.loadImage.wtfImage.height(), JOptionPane.INFORMATION_MESSAGE);
+                JDialog dialog = optionPane.createDialog("Note");
+                dialog.setSize(450, 120);
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                return;
+            }
+            String pixelText = widthPicker.getValue() + " x " + heightPicker.getValue();
+            JDialog dialog = new JDialog((Frame) null, pixelText , true);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setSize(400, 200);
+            dialog.setLayout(new BorderLayout());
+            JButton close = new JButton("close");
+
+            EditablePixel pixel = panelNorth.loadImage.editableWtfImage.at((int) widthPicker.getValue()-1, (int )heightPicker.getValue()-1);
+            StringBuilder pixelString = new StringBuilder("");
+            for(ColorChannel c : pixel.colorSpace().channels()){
+                pixelString.append(" ").append(c.name()).append(": ").append(pixel.valueOf(c)).append("\n");
+            }
+            //pixelString = pixel.colorSpace().channels().stream().reduce(pixelString, (intermediate, e) -> e.type().toString());
+            JTextArea pixelInfo = new JTextArea(pixelString.toString());
+            dialog.add(pixelInfo, BorderLayout.CENTER);
+            dialog.add(close, BorderLayout.SOUTH);
+            close.addActionListener( e -> {
+                dialog.dispose();
+                mainPanel.remove(colorPickerPanel);
+                mainPanel.revalidate();
+                mainPanel.repaint();
+            });
+            dialog.setLocationRelativeTo(null); // zentrieren
+            dialog.setVisible(true);
+
+        });
+        mainPanel.add(colorPickerPanel, BorderLayout.EAST);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
 
 
 }

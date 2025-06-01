@@ -7,6 +7,7 @@ import wtf.file.api.WtfLoader;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
 import wtf.file.api.editable.EditableWtfImage;
+import wtf.file.api.editable.compression.DataCompressionType;
 import wtf.file.api.exception.WtfException;
 import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
@@ -284,7 +285,8 @@ public class LoadImage {
                         if(editableWtfImage.width()*editableWtfImage.height() < 50000) {
                             editableWtfImage.save(path);
                         } else {
-                            //editableWtfImage.save();
+                            System.out.println("no compression");
+                            editableWtfImage.save(path, DataCompressionType.NO_COMPRESSION);
                         }
                         System.out.println("Saved this Image");
                     } catch (IOException | WtfException ex) {
