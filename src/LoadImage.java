@@ -253,7 +253,15 @@ public class LoadImage {
         int result = fileChooser.showOpenDialog(panel);
         //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
         if(result == JFileChooser.APPROVE_OPTION) {
-            return fileChooser.getSelectedFile().toPath();
+            File selectedFile = fileChooser.getSelectedFile();
+            String fileName = selectedFile.getName();
+            String extension = ".wtf";
+
+            if (!fileName.toLowerCase().endsWith(extension)) {
+                selectedFile = new File(selectedFile.getParentFile(), fileName + extension);
+            }
+
+            return selectedFile.toPath();
         }
         return null;
     }
@@ -279,16 +287,12 @@ public class LoadImage {
                         editableWtfImage = wtfImage.edit();
                     }
                     try {
-                        System.out.println("I will ask for a path");
                         Path path = getSavingPath();
-                        System.out.println("Got a Path");
                         if(editableWtfImage.width()*editableWtfImage.height() < 50000) {
                             editableWtfImage.save(path);
                         } else {
-                            System.out.println("no compression");
                             editableWtfImage.save(path, DataCompressionType.NO_COMPRESSION);
                         }
-                        System.out.println("Saved this Image");
                     } catch (IOException | WtfException ex) {
                         throw new RuntimeException(ex);
                     }

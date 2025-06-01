@@ -272,10 +272,37 @@ public class ImageFunction {
         dialog.setVisible(true);
     }
     protected void invertColor() {
+        if(panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+        CreatePanel invert = new CreatePanel();
+        invert.setPreferredSize(new Dimension(200, 50));
+        invert.setLayout(new GridLayout(8, 1));
+        invert.setBackground(Colors.MAKERSPACEBACKGROUND);
 
+        JLabel label1 = new JLabel("   Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
+                + " x "
+                + panelNorth.loadImage.editableWtfImage.height());
+        JLabel widthText = new JLabel("  width");
+        widthPicker = new JSpinner();
+        JLabel heightText = new JLabel("  height");
+        heightPicker = new JSpinner();
+        invert.add(label1);
+        invert.add(widthText);
+        invert.add(widthPicker);
+        invert.add(heightText);
+        invert.add(heightPicker);
+        JPanel background = new JPanel();
+        background.setBackground(Colors.MAKERSPACEBACKGROUND);
+        invert.add(background);
+
+        JButton showValues = new JButton("Invert");
+        invert.add(showValues);
+        mainPanel.add(invert, BorderLayout.EAST);
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
     protected void colorPicker() {
-        System.out.println("here");
         if(panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
         }
@@ -284,22 +311,38 @@ public class ImageFunction {
         colorPickerPanel.setLayout(new GridLayout(8, 1));
         colorPickerPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
 
-        JLabel label1 = new JLabel("Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
+        JLabel label1 = new JLabel("   Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
                 + " x "
                 + panelNorth.loadImage.editableWtfImage.height());
-        JLabel widthText = new JLabel("width");
+        JLabel widthText = new JLabel("  width");
         widthPicker = new JSpinner();
-        JLabel heightText = new JLabel("height");
+        JLabel heightText = new JLabel("  height");
         heightPicker = new JSpinner();
         colorPickerPanel.add(label1);
         colorPickerPanel.add(widthText);
         colorPickerPanel.add(widthPicker);
         colorPickerPanel.add(heightText);
         colorPickerPanel.add(heightPicker);
+        JPanel background = new JPanel();
+        background.setBackground(Colors.MAKERSPACEBACKGROUND);
+        colorPickerPanel.add(background);
 
-        JButton okButton = new JButton("Okay");
-        colorPickerPanel.add(okButton);
-        okButton.addActionListener( x ->  {
+        JButton showValues = new JButton("Show values");
+        colorPickerPanel.add(showValues);
+
+        JButton invertThisValue = new JButton("Invert this value");
+        JButton closePanel = new JButton("close");
+        invertThisValue.addActionListener(x -> {
+            mainPanel.remove(colorPickerPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+        closePanel.addActionListener( x -> {
+            mainPanel.remove(colorPickerPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+        showValues.addActionListener( x ->  {
             if((int)widthPicker.getValue() < 1
                     || (int)widthPicker.getValue() > panelNorth.loadImage.wtfImage.width()
                     || (int)heightPicker.getValue() < 1
@@ -315,7 +358,7 @@ public class ImageFunction {
             String pixelText = widthPicker.getValue() + " x " + heightPicker.getValue();
             JDialog dialog = new JDialog((Frame) null, pixelText , true);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.setSize(400, 200);
+            dialog.setSize(200, 150);
             dialog.setLayout(new BorderLayout());
             JButton close = new JButton("close");
 
@@ -324,13 +367,14 @@ public class ImageFunction {
             for(ColorChannel c : pixel.colorSpace().channels()){
                 pixelString.append(" ").append(c.name()).append(": ").append(pixel.valueOf(c)).append("\n");
             }
-            //pixelString = pixel.colorSpace().channels().stream().reduce(pixelString, (intermediate, e) -> e.type().toString());
             JTextArea pixelInfo = new JTextArea(pixelString.toString());
             dialog.add(pixelInfo, BorderLayout.CENTER);
             dialog.add(close, BorderLayout.SOUTH);
             close.addActionListener( e -> {
                 dialog.dispose();
-                mainPanel.remove(colorPickerPanel);
+                colorPickerPanel.remove(showValues);
+                colorPickerPanel.add(invertThisValue);
+                colorPickerPanel.add(closePanel);
                 mainPanel.revalidate();
                 mainPanel.repaint();
             });
@@ -341,6 +385,7 @@ public class ImageFunction {
         mainPanel.add(colorPickerPanel, BorderLayout.EAST);
         mainPanel.revalidate();
         mainPanel.repaint();
+
     }
 
 
