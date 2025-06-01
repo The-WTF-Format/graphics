@@ -281,7 +281,11 @@ public class LoadImage {
                         System.out.println("I will ask for a path");
                         Path path = getSavingPath();
                         System.out.println("Got a Path");
-                        editableWtfImage.save(path);
+                        if(editableWtfImage.width()*editableWtfImage.height() < 50000) {
+                            editableWtfImage.save(path);
+                        } else {
+                            //editableWtfImage.save();
+                        }
                         System.out.println("Saved this Image");
                     } catch (IOException | WtfException ex) {
                         throw new RuntimeException(ex);
