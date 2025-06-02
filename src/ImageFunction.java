@@ -1,5 +1,6 @@
 import values.Colors;
 import wtf.file.api.color.ColorSpace;
+import wtf.file.api.color.ColorSpaceChannels;
 import wtf.file.api.color.channel.ColorChannel;
 import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.editable.data.EditablePixel;
@@ -408,24 +409,59 @@ public class ImageFunction {
         mainPanel.revalidate();
         mainPanel.repaint();
     }
+    //-----Invertierung Methode-----//
+    //Pixel wird übergeben und ColorSpace wird abgefragt
+    //Bei HSV muss nur der Channel HUE um 180 gedreht werden
+    //Bei anderen Spaces wird
     private void invertColor(EditablePixel pixel) {
+        //new Map fürs Invertieren erstellen
         Map <ColorChannel, Short> newMap = new HashMap<>();
+        //aktueller ColorSpace
+        ColorSpace colorSpace = pixel.colorSpace();
 
-        for (ColorChannel c : pixel.values().keySet()) {
-            if(!c.name().equals("alpha")) {
-                newMap.put(c, (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) - pixel.valueOf(c)-1));
-                System.out.println("Channel Width: " + panelNorth.loadImage.editableWtfImage.channelWidth() + " actual value: " + pixel.valueOf(c) + " new value: " + (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) - pixel.valueOf(c)-1));
-            } else {
-                newMap.put(c, pixel.valueOf(c));
-                System.out.println(c.name());
+        // Maximalen Wert für die aktuelle Bit-Tiefe berechnen
+        short maxValue = (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) -1);
+
+        if (colorSpace == ColorSpace.HSV ||
+                colorSpace == ColorSpace.HSVa ||
+                colorSpace == ColorSpace.DYNAMIC_HSVa) {
+            //HUE muss um 180° gedreht werden
+            for (ColorChannel c : pixel.values().keySet()) {
+                //Nur HUE Channel drehen, SAT und VAL bleiben gleich, da es sonst zu zu dunklen Pixel kommen kann
+                //trotzdem durch alle Channels durchloopen, da sonst SAT und VAl durch Map auf 0 gesetzt werden -> ungewünschter Farbeffekt
+                if (c.equals(ColorSpaceChannels.HUE)) {
+                    short invertedValue = (short) ((pixel.valueOf(c) + (maxValue + 1) / 2) % (maxValue + 1));
+                    newMap.put(c, invertedValue);
+
+                } else {
+                    newMap.put(c, pixel.valueOf(c));
+                }
+            }
+        } else {
+
+            // Standard-Inversion: Alle Farbkanäle (außer Alpha) invertieren
+            for (ColorChannel c : pixel.values().keySet()) {
+                if (!c.name().equals("alpha")) {
+                    // Farbkanal invertieren
+                    short invertedValue = (short) (maxValue - pixel.valueOf(c));
+                    newMap.put(c, invertedValue);
+                } else {
+                    // Alpha unverändert
+                    newMap.put(c, pixel.valueOf(c));
+
+                }
             }
         }
+        //Invertierung auf Pixel anwenden
         pixel.setValues(newMap);
-        try{
+
+        //Bild aktualisieren
+        try {
             panelNorth.loadImage.showImage();
         } catch (InterruptedException ex) {
-            System.out.println(ex);
+            System.out.println("Error at showing edits: " + ex);
         }
+
     }
     protected void colorPicker() {
         if(panelNorth.loadImage.editableWtfImage == null) {
