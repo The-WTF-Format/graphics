@@ -247,7 +247,7 @@ public class LoadImage {
         return null;
 
     }
-    private Path getSavingPath() {
+    private Path getSavingPath(Boolean isWTFImage) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Pfad auswählen");
         int result = fileChooser.showOpenDialog(panel);
@@ -257,7 +257,7 @@ public class LoadImage {
             String fileName = selectedFile.getName();
             String extension = ".wtf";
 
-            if (!fileName.toLowerCase().endsWith(extension)) {
+            if (isWTFImage && !fileName.toLowerCase().endsWith(extension)) {
                 selectedFile = new File(selectedFile.getParentFile(), fileName + extension);
             }
 
@@ -287,7 +287,7 @@ public class LoadImage {
                         editableWtfImage = wtfImage.edit();
                     }
                     try {
-                        Path path = getSavingPath();
+                        Path path = getSavingPath(true);
                         if(editableWtfImage.width()*editableWtfImage.height() < 50000) {
                             editableWtfImage.save(path);
                         } else {
@@ -297,8 +297,15 @@ public class LoadImage {
                         throw new RuntimeException(ex);
                     }
                 } else {
+                    Path path = getSavingPath(false);
+                    File file;
                     // normal Image formats
-                    File file = new File((getSavingPath().toString()) + "." +  standardFormat);
+                    if (!path.toString().toLowerCase().endsWith(standardFormat)) {
+                        file = new File(path.toString() + "." +  standardFormat);
+                    } else {
+                        file = new File(path.toString());
+                    }
+
                     try {
                        ImageIO.write(image, standardFormat, file);
                     } catch (Exception ex) {
@@ -308,7 +315,7 @@ public class LoadImage {
                 }
                 panel.remove(imagePanel);
                 Visible.setInvisible(saveButton);
-                if(wtfImage.animationInformation().isAnimated()) {
+                if(wtfImage != null && wtfImage.animationInformation().isAnimated()) {
                     Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
                             editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
                             editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);

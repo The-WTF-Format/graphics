@@ -393,7 +393,7 @@ public class ImageFunction {
                     dialog.setVisible(true);
                     return;
                 }
-                invertColor((int)widthPicker.getValue(), (int)heightPicker.getValue(), panelNorth.loadImage.editableWtfImage.at((int) widthPicker.getValue()-1, (int )heightPicker.getValue()-1));
+                invertColor(panelNorth.loadImage.editableWtfImage.at((int) widthPicker.getValue()-1, (int )heightPicker.getValue()-1));
             }
         });
         JButton closeButton = new JButton("close");
@@ -408,15 +408,19 @@ public class ImageFunction {
         mainPanel.revalidate();
         mainPanel.repaint();
     }
-    private void invertColor(int x, int y, EditablePixel pixel) {
+    private void invertColor(EditablePixel pixel) {
         Map <ColorChannel, Short> newMap = new HashMap<>();
 
         for (ColorChannel c : pixel.values().keySet()) {
-            newMap.put(c, (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) - pixel.valueOf(c)-1));
-            System.out.println("Channel Width: " + panelNorth.loadImage.editableWtfImage.channelWidth() + " actual value" + pixel.valueOf(c) + " new value: " + (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) - pixel.valueOf(c)-1));
+            if(!c.name().equals("alpha")) {
+                newMap.put(c, (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) - pixel.valueOf(c)-1));
+                System.out.println("Channel Width: " + panelNorth.loadImage.editableWtfImage.channelWidth() + " actual value: " + pixel.valueOf(c) + " new value: " + (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) - pixel.valueOf(c)-1));
+            } else {
+                newMap.put(c, pixel.valueOf(c));
+                System.out.println(c.name());
+            }
         }
-        EditablePixel[][] original = panelNorth.loadImage.editableWtfImage.pixels();
-        original[x-1][y-1].setValues(newMap);
+        pixel.setValues(newMap);
         try{
             panelNorth.loadImage.showImage();
         } catch (InterruptedException ex) {
@@ -459,7 +463,7 @@ public class ImageFunction {
             mainPanel.remove(colorPickerPanel);
             mainPanel.revalidate();
             mainPanel.repaint();
-            invertColor((int)widthPicker.getValue(), (int)heightPicker.getValue(),pixel);
+            invertColor(pixel);
         });
         closePanel.addActionListener( x -> {
             Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
