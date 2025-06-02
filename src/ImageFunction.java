@@ -3,12 +3,18 @@ import wtf.file.api.color.ColorSpace;
 import wtf.file.api.color.ColorSpaceChannels;
 import wtf.file.api.color.channel.ColorChannel;
 import wtf.file.api.editable.EditableWtfImage;
+import wtf.file.api.editable.data.EditableFrame;
 import wtf.file.api.editable.data.EditablePixel;
+import wtf.file.api.exception.NumberOutOfBoundsException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,10 +29,12 @@ public class ImageFunction {
     JSpinner widthPicker;
     JSpinner heightPicker;
     EditablePixel pixel;
+    LoadImage loadimage;
 
     public ImageFunction(PanelNorth panelNorth, JPanel mainPanel) {
         this.panelNorth = panelNorth;
         this.mainPanel = mainPanel;
+        this.loadimage = panelNorth.loadImage;
 
         //ToDo panel wird mit Null übergeben -> muss gefixt werden, sonst wird bild nicht übergeben
 
@@ -109,33 +117,6 @@ public class ImageFunction {
         );
     }
 
-    // ----------Methoden zum Panel herzeigen----------//
-    protected void showTransformationPanel(TransformationType... transformations) {
-        CreatePanel gridPanel = new CreatePanel();
-        gridPanel.setLayout(new FlowLayout());
-        gridPanel.setBackground(Color.LIGHT_GRAY);
-        gridPanel.setPreferredSize(new Dimension(200, 50));
-
-        if(panelNorth.loadImage.editableWtfImage == null) {
-            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
-        }
-
-        // Buttons basierend auf den übergebenen Transformationen erstellen
-        for (TransformationType transformation : transformations) {
-            JButton button = createTransformationButton(transformation);
-            gridPanel.add(button);
-        }
-
-        JButton closeButton = new JButton("✕ Schließen");
-        closeButton.addActionListener(e -> closePanelInEast());
-        gridPanel.add(closeButton);
-
-        // Panel anzeigen
-        showPanelInEast(gridPanel);
-    }
-
-
-
     protected void colorSpaceSelection() {
         JDialog dialog = new JDialog((Frame) null, "Choose colorspace", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -191,6 +172,220 @@ public class ImageFunction {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    protected void colorPicker() {
+        if(panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+        CreatePanel colorPickerPanel = new CreatePanel();
+        colorPickerPanel.setPreferredSize(new Dimension(200, 50));
+        colorPickerPanel.setLayout(new GridLayout(8, 1));
+        colorPickerPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
+
+        JLabel label1 = new JLabel("   Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
+                + " x "
+                + panelNorth.loadImage.editableWtfImage.height());
+        JLabel widthText = new JLabel("  width");
+        widthPicker = new JSpinner();
+        JLabel heightText = new JLabel("  height");
+        heightPicker = new JSpinner();
+        colorPickerPanel.add(label1);
+        colorPickerPanel.add(widthText);
+        colorPickerPanel.add(widthPicker);
+        colorPickerPanel.add(heightText);
+        colorPickerPanel.add(heightPicker);
+        JPanel background = new JPanel();
+        background.setBackground(Colors.MAKERSPACEBACKGROUND);
+        colorPickerPanel.add(background);
+
+        JButton showValues = new JButton("Show values");
+        colorPickerPanel.add(showValues);
+
+        JButton invertThisValue = new JButton("Invert this value");
+        JButton closePanel = new JButton("close");
+        invertThisValue.addActionListener(x -> {
+            Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+            mainPanel.remove(colorPickerPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+            invertColor(pixel);
+        });
+        closePanel.addActionListener( x -> {
+            Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+            mainPanel.remove(colorPickerPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+        showValues.addActionListener( x ->  {
+            if((int)widthPicker.getValue() < 1
+                    || (int)widthPicker.getValue() > panelNorth.loadImage.wtfImage.width()
+                    || (int)heightPicker.getValue() < 1
+                    || (int)heightPicker.getValue() > panelNorth.loadImage.wtfImage.height()) {
+                JOptionPane optionPane = new JOptionPane("The width values have to be between 1 and " + panelNorth.loadImage.wtfImage.width()
+                        + "\nThe height values have to be between 1 and " + panelNorth.loadImage.wtfImage.height(), JOptionPane.INFORMATION_MESSAGE);
+                JDialog dialog = optionPane.createDialog("Note");
+                dialog.setSize(450, 120);
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                return;
+            }
+            String pixelText = widthPicker.getValue() + " x " + heightPicker.getValue();
+            JDialog dialog = new JDialog((Frame) null, pixelText , true);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setSize(200, 150);
+            dialog.setLayout(new BorderLayout());
+            JButton close = new JButton("close");
+
+            pixel = panelNorth.loadImage.editableWtfImage.at((int) widthPicker.getValue()-1, (int )heightPicker.getValue()-1);
+            StringBuilder pixelString = new StringBuilder("");
+            for(ColorChannel c : pixel.colorSpace().channels()){
+                pixelString.append(" ").append(c.name()).append(": ").append(pixel.valueOf(c)).append("\n");
+            }
+            JTextArea pixelInfo = new JTextArea(pixelString.toString());
+            dialog.add(pixelInfo, BorderLayout.CENTER);
+            dialog.add(close, BorderLayout.SOUTH);
+            close.addActionListener( e -> {
+                dialog.dispose();
+                colorPickerPanel.remove(showValues);
+                colorPickerPanel.add(invertThisValue);
+                colorPickerPanel.add(closePanel);
+                mainPanel.revalidate();
+                mainPanel.repaint();
+            });
+            dialog.setLocationRelativeTo(null); // zentrieren
+            dialog.setVisible(true);
+
+        });
+        mainPanel.add(colorPickerPanel, BorderLayout.EAST);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+
+    }
+
+    protected void invertColorPopUp() {
+        if(panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+        CreatePanel invert = new CreatePanel();
+        invert.setPreferredSize(new Dimension(200, 50));
+        invert.setLayout(new GridLayout(8, 1));
+        invert.setBackground(Colors.MAKERSPACEBACKGROUND);
+
+        JLabel label1 = new JLabel("   Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
+                + " x "
+                + panelNorth.loadImage.editableWtfImage.height());
+        JLabel widthText = new JLabel("  width");
+        widthPicker = new JSpinner();
+        JLabel heightText = new JLabel("  height");
+        heightPicker = new JSpinner();
+        invert.add(label1);
+        invert.add(widthText);
+        invert.add(widthPicker);
+        invert.add(heightText);
+        invert.add(heightPicker);
+        JPanel background = new JPanel();
+        background.setBackground(Colors.MAKERSPACEBACKGROUND);
+        invert.add(background);
+
+        JButton showValues = new JButton("Invert");
+        invert.add(showValues);
+        showValues.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if((int)widthPicker.getValue() < 1
+                        || (int)widthPicker.getValue() > panelNorth.loadImage.wtfImage.width()
+                        || (int)heightPicker.getValue() < 1
+                        || (int)heightPicker.getValue() > panelNorth.loadImage.wtfImage.height()) {
+                    JOptionPane optionPane = new JOptionPane("The width values have to be between 1 and " + panelNorth.loadImage.wtfImage.width()
+                            + "\nThe height values have to be between 1 and " + panelNorth.loadImage.wtfImage.height(), JOptionPane.INFORMATION_MESSAGE);
+                    JDialog dialog = optionPane.createDialog("Note");
+                    dialog.setSize(450, 120);
+                    dialog.setLocationRelativeTo(null);
+                    dialog.setVisible(true);
+                    return;
+                }
+                invertColor(panelNorth.loadImage.editableWtfImage.at((int) widthPicker.getValue()-1, (int )heightPicker.getValue()-1));
+            }
+        });
+        JButton closeButton = new JButton("close");
+        closeButton.addActionListener( x -> {
+            Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+            mainPanel.remove(invert);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
+        invert.add(closeButton);
+        mainPanel.add(invert, BorderLayout.EAST);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    public void converter(String extension) {
+        if (panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+        //Frame nehmen
+        EditableFrame frame = panelNorth.loadImage.editableWtfImage;
+        //ColorSpace nehmen
+        ColorSpace cs = frame.at(1, 1).colorSpace();
+
+        //als Java Image ausgeben damit es für Konvertierung alle Kriteren erfüllt(ColorSpace)
+        Image WTFimage = panelNorth.loadImage.editableWtfImage.asJavaImage();
+        int width = panelNorth.loadImage.editableWtfImage.width();
+        int height = panelNorth.loadImage.editableWtfImage.height();
+
+        //Abfrage ob Alpha Kanal vorhanden ist
+        boolean hasAlpha = false;
+        for (ColorChannel channel : cs.channels()) {
+            if (channel == ColorSpaceChannels.FIXED_ALPHA || channel == ColorSpaceChannels.DYNAMIC_ALPHA) {
+                hasAlpha = true;
+                break;
+            }
+        }
+
+        //JPEG unterstützt keine Transparenz!
+        int imageType;
+        if (extension.equalsIgnoreCase("JPEG")) {
+            imageType = BufferedImage.TYPE_INT_RGB; // kein Alpha für JPEG!
+        } else {
+            imageType = hasAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+        }
+        BufferedImage bufferedImage = new BufferedImage(width, height, imageType);
+
+        //Image als BufferedImage nachzeichnen
+        Graphics2D g2d = bufferedImage.createGraphics();
+        g2d.drawImage(WTFimage, 0, 0, null);
+        g2d.dispose();
+
+        panelNorth.loadImage.doSaveImage(bufferedImage, extension);
+    }
+
+    // ----------Methoden zum Panel herzeigen----------//
+    protected void showTransformationPanel(TransformationType... transformations) {
+        CreatePanel gridPanel = new CreatePanel();
+        gridPanel.setLayout(new FlowLayout());
+        gridPanel.setBackground(Color.LIGHT_GRAY);
+        gridPanel.setPreferredSize(new Dimension(200, 50));
+
+        if(panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+
+        // Buttons basierend auf den übergebenen Transformationen erstellen
+        for (TransformationType transformation : transformations) {
+            JButton button = createTransformationButton(transformation);
+            gridPanel.add(button);
+        }
+
+        JButton closeButton = new JButton("✕ Schließen");
+        closeButton.addActionListener(e -> closePanelInEast());
+        gridPanel.add(closeButton);
+
+        // Panel anzeigen
+        showPanelInEast(gridPanel);
     }
 
     //------------private Methods----------------//
@@ -299,9 +494,11 @@ public class ImageFunction {
     protected void secondsPerFrames() {
         frames("Seconds per frame", "Seconds per frame (0 - 127)");
     }
+
     protected void framesPerSeconds() {
         frames("Frames per seconds", "Frames per seconds (0 - 127)");
     }
+
     private void frames(String header, String text) {
         JDialog dialog = new JDialog((Frame) null, header, true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -351,64 +548,6 @@ public class ImageFunction {
     }
 
     //Color
-    protected void invertColorPopUp() {
-        if(panelNorth.loadImage.editableWtfImage == null) {
-            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
-        }
-        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
-        CreatePanel invert = new CreatePanel();
-        invert.setPreferredSize(new Dimension(200, 50));
-        invert.setLayout(new GridLayout(8, 1));
-        invert.setBackground(Colors.MAKERSPACEBACKGROUND);
-
-        JLabel label1 = new JLabel("   Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
-                + " x "
-                + panelNorth.loadImage.editableWtfImage.height());
-        JLabel widthText = new JLabel("  width");
-        widthPicker = new JSpinner();
-        JLabel heightText = new JLabel("  height");
-        heightPicker = new JSpinner();
-        invert.add(label1);
-        invert.add(widthText);
-        invert.add(widthPicker);
-        invert.add(heightText);
-        invert.add(heightPicker);
-        JPanel background = new JPanel();
-        background.setBackground(Colors.MAKERSPACEBACKGROUND);
-        invert.add(background);
-
-        JButton showValues = new JButton("Invert");
-        invert.add(showValues);
-        showValues.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if((int)widthPicker.getValue() < 1
-                        || (int)widthPicker.getValue() > panelNorth.loadImage.wtfImage.width()
-                        || (int)heightPicker.getValue() < 1
-                        || (int)heightPicker.getValue() > panelNorth.loadImage.wtfImage.height()) {
-                    JOptionPane optionPane = new JOptionPane("The width values have to be between 1 and " + panelNorth.loadImage.wtfImage.width()
-                            + "\nThe height values have to be between 1 and " + panelNorth.loadImage.wtfImage.height(), JOptionPane.INFORMATION_MESSAGE);
-                    JDialog dialog = optionPane.createDialog("Note");
-                    dialog.setSize(450, 120);
-                    dialog.setLocationRelativeTo(null);
-                    dialog.setVisible(true);
-                    return;
-                }
-                invertColor(panelNorth.loadImage.editableWtfImage.at((int) widthPicker.getValue()-1, (int )heightPicker.getValue()-1));
-            }
-        });
-        JButton closeButton = new JButton("close");
-        closeButton.addActionListener( x -> {
-            Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
-            mainPanel.remove(invert);
-            mainPanel.revalidate();
-            mainPanel.repaint();
-        });
-        invert.add(closeButton);
-        mainPanel.add(invert, BorderLayout.EAST);
-        mainPanel.revalidate();
-        mainPanel.repaint();
-    }
     //-----Invertierung Methode-----//
     //Pixel wird übergeben und ColorSpace wird abgefragt
     //Bei HSV muss nur der Channel HUE um 180 gedreht werden
@@ -461,95 +600,6 @@ public class ImageFunction {
         } catch (InterruptedException ex) {
             System.out.println("Error at showing edits: " + ex);
         }
-
-    }
-    protected void colorPicker() {
-        if(panelNorth.loadImage.editableWtfImage == null) {
-            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
-        }
-        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
-        CreatePanel colorPickerPanel = new CreatePanel();
-        colorPickerPanel.setPreferredSize(new Dimension(200, 50));
-        colorPickerPanel.setLayout(new GridLayout(8, 1));
-        colorPickerPanel.setBackground(Colors.MAKERSPACEBACKGROUND);
-
-        JLabel label1 = new JLabel("   Enter a Coordinate: " + panelNorth.loadImage.editableWtfImage.width()
-                + " x "
-                + panelNorth.loadImage.editableWtfImage.height());
-        JLabel widthText = new JLabel("  width");
-        widthPicker = new JSpinner();
-        JLabel heightText = new JLabel("  height");
-        heightPicker = new JSpinner();
-        colorPickerPanel.add(label1);
-        colorPickerPanel.add(widthText);
-        colorPickerPanel.add(widthPicker);
-        colorPickerPanel.add(heightText);
-        colorPickerPanel.add(heightPicker);
-        JPanel background = new JPanel();
-        background.setBackground(Colors.MAKERSPACEBACKGROUND);
-        colorPickerPanel.add(background);
-
-        JButton showValues = new JButton("Show values");
-        colorPickerPanel.add(showValues);
-
-        JButton invertThisValue = new JButton("Invert this value");
-        JButton closePanel = new JButton("close");
-        invertThisValue.addActionListener(x -> {
-            Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
-            mainPanel.remove(colorPickerPanel);
-            mainPanel.revalidate();
-            mainPanel.repaint();
-            invertColor(pixel);
-        });
-        closePanel.addActionListener( x -> {
-            Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
-            mainPanel.remove(colorPickerPanel);
-            mainPanel.revalidate();
-            mainPanel.repaint();
-        });
-        showValues.addActionListener( x ->  {
-            if((int)widthPicker.getValue() < 1
-                    || (int)widthPicker.getValue() > panelNorth.loadImage.wtfImage.width()
-                    || (int)heightPicker.getValue() < 1
-                    || (int)heightPicker.getValue() > panelNorth.loadImage.wtfImage.height()) {
-                JOptionPane optionPane = new JOptionPane("The width values have to be between 1 and " + panelNorth.loadImage.wtfImage.width()
-                        + "\nThe height values have to be between 1 and " + panelNorth.loadImage.wtfImage.height(), JOptionPane.INFORMATION_MESSAGE);
-                JDialog dialog = optionPane.createDialog("Note");
-                dialog.setSize(450, 120);
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-                return;
-            }
-            String pixelText = widthPicker.getValue() + " x " + heightPicker.getValue();
-            JDialog dialog = new JDialog((Frame) null, pixelText , true);
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.setSize(200, 150);
-            dialog.setLayout(new BorderLayout());
-            JButton close = new JButton("close");
-
-            pixel = panelNorth.loadImage.editableWtfImage.at((int) widthPicker.getValue()-1, (int )heightPicker.getValue()-1);
-            StringBuilder pixelString = new StringBuilder("");
-            for(ColorChannel c : pixel.colorSpace().channels()){
-                pixelString.append(" ").append(c.name()).append(": ").append(pixel.valueOf(c)).append("\n");
-            }
-            JTextArea pixelInfo = new JTextArea(pixelString.toString());
-            dialog.add(pixelInfo, BorderLayout.CENTER);
-            dialog.add(close, BorderLayout.SOUTH);
-            close.addActionListener( e -> {
-                dialog.dispose();
-                colorPickerPanel.remove(showValues);
-                colorPickerPanel.add(invertThisValue);
-                colorPickerPanel.add(closePanel);
-                mainPanel.revalidate();
-                mainPanel.repaint();
-            });
-            dialog.setLocationRelativeTo(null); // zentrieren
-            dialog.setVisible(true);
-
-        });
-        mainPanel.add(colorPickerPanel, BorderLayout.EAST);
-        mainPanel.revalidate();
-        mainPanel.repaint();
 
     }
 
@@ -642,6 +692,10 @@ public class ImageFunction {
             }
             Visible.setVisible(panelNorth.loadImage.saveButton,panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
         }
+    }
+
+    private int clampToByte(int value) {
+        return Math.min(255, Math.max(0, value));
     }
 
 }

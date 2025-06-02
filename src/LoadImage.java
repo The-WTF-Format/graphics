@@ -271,48 +271,20 @@ public class LoadImage {
         saveButton.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         saveButton.setMaximumSize(Size.BUTTONSIZEMAINMENU);
         saveButton.setBackground(Colors.ITEMSPRIMARY);
+
         lowPanel = new JPanel();
         lowPanel.setLayout(new FlowLayout());
         lowPanel.setBackground(Colors.BACKGROUND);
+
         panel.add(lowPanel, BorderLayout.SOUTH);
+
         lowPanel.add(saveButton);
         Visible.setInvisible(saveButton);
+
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(wtfImage!= null) {
-                    // saving a WTF Image
-                    if(editableWtfImage == null) {
-                        // initialize editableWTFImage if it does not exist yet
-                        editableWtfImage = wtfImage.edit();
-                    }
-                    try {
-                        Path path = getSavingPath(true);
-                        if(editableWtfImage.width()*editableWtfImage.height() < 50000) {
-                            editableWtfImage.save(path);
-                        } else {
-                            editableWtfImage.save(path, DataCompressionType.NO_COMPRESSION);
-                        }
-                    } catch (IOException | WtfException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                } else {
-                    Path path = getSavingPath(false);
-                    File file;
-                    // normal Image formats
-                    if (!path.toString().toLowerCase().endsWith(standardFormat)) {
-                        file = new File(path.toString() + "." +  standardFormat);
-                    } else {
-                        file = new File(path.toString());
-                    }
-
-                    try {
-                       ImageIO.write(image, standardFormat, file);
-                    } catch (Exception ex) {
-                        System.out.println("Error when saving Image: " + ex);
-                    }
-
-                }
+                doSaveImage(null, "WTF");
                 panel.remove(imagePanel);
                 Visible.setInvisible(saveButton);
                 if(wtfImage != null && wtfImage.animationInformation().isAnimated()) {
@@ -336,6 +308,7 @@ public class LoadImage {
                 panel.revalidate();
             }
         });
+
     }
     private void createNewImage(WtfImageBuilder builder) {
         new CreateNewImage(this, builder);
@@ -467,6 +440,59 @@ public class LoadImage {
                         editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
             }
         });
+    }
+
+    void doSaveImage(BufferedImage image, String extension) {
+        extension = extension.toLowerCase();
+
+
+        //Fall WTF Image
+        if (extension.equals("wtf")) {
+            if (wtfImage != null) {
+                if (editableWtfImage == null) {
+                    editableWtfImage = wtfImage.edit();
+                }
+                try {
+                    //Weg zum Speichern wählen
+                    Path path = getSavingPath(true); // true = WTF Format
+                    //Kompremieren
+                    if (editableWtfImage.width() * editableWtfImage.height() < 50000) {
+                        editableWtfImage.save(path);
+                    } else {
+                        editableWtfImage.save(path, DataCompressionType.NO_COMPRESSION);
+                    }
+                } catch (IOException | WtfException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                System.out.println("No WTF image to save.");
+            }
+
+        } else if (extension.equals("jpeg") || extension.equals("png")) {
+            if (image != null) {
+                Path path = getSavingPath(false);
+                String pathStr = path.toString();
+                String extLower = extension.toLowerCase();
+
+                // prüft, ob die Datei-Endung bereits vorhanden ist (unabhängig von Groß-/Kleinschreibung)
+                if (!pathStr.toLowerCase().endsWith("." + extLower)) {
+                    pathStr += "." + extLower;
+                }
+
+                File file = new File(pathStr);
+
+                try {
+                    ImageIO.write(image, extLower, file);
+                } catch (Exception ex) {
+                    System.out.println("Error at saving as " + extension + ": " + ex);
+                }
+            } else {
+                System.out.println("No BufferedImage to save.");
+            }
+
+        } else {
+            System.out.println("Unknown Format: " + extension);
+        }
     }
 
 }

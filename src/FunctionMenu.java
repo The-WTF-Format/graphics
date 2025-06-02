@@ -101,7 +101,6 @@ public class FunctionMenu {
         converterMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-        addMenuItem(converterMenu, ActionRouter.createFunctionMenuActionRouter(this), "GIF");
         addMenuItem(converterMenu,  ActionRouter.createFunctionMenuActionRouter(this), "JPEG");
         addMenuItem(converterMenu,  ActionRouter.createFunctionMenuActionRouter(this), "PNG");
 
@@ -152,6 +151,13 @@ public class FunctionMenu {
                             break;
                         case "Mirror...":
                             imageFunction.mirrorEditable();
+                            break;
+                        case "JPEG":
+                            imageFunction.converter("JPEG");
+                            break;
+                        case "PNG":
+                            imageFunction.converter("PNG");
+                            break;
                         default:
                             System.out.println("Unbekannte Aktion: " + name);
                     }
