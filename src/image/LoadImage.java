@@ -1,7 +1,12 @@
-import image.BufferedImagePanel;
-import image.ImagePanel;
-import values.Colors;
-import values.Size;
+package image;
+
+import editorview.EditViewButton;
+import panel.BufferedImagePanel;
+import panel.CreatePanel;
+import panel.ImagePanel;
+import utils.Colors;
+import utils.Size;
+import utils.Visible;
 import wtf.file.api.WtfImage;
 import wtf.file.api.WtfLoader;
 import wtf.file.api.builder.WtfImageBuilder;
@@ -9,50 +14,39 @@ import wtf.file.api.color.ColorSpace;
 import wtf.file.api.editable.EditableWtfImage;
 import wtf.file.api.editable.compression.DataCompressionType;
 import wtf.file.api.exception.WtfException;
-import wtf.file.api.v1.impl.editable.EditableWtfImageImpl;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.List;
-
 
 public class LoadImage {
-    JButton saveButton;
+    public JButton saveButton;
     JMenuBar menu;
-    JMenu loadImage;
-    CreatePanel panel;
+    public JMenu loadImage;
+    public CreatePanel panel;
     JPanel lowPanel;
     ImagePanel imagePanel;
     BufferedImage image;
-    JMenuItem createNewImage;
-    JMenuItem byPath;
+    public JMenuItem createNewImage;
+    public JMenuItem byPath;
     JMenuItem normalImage;
-    EditViewButton editViewButton;
-    WtfImage wtfImage;
+    public EditViewButton editViewButton;
+    public WtfImage wtfImage;
     WtfImageBuilder builder;
-    EditableWtfImage editableWtfImage;
+    public EditableWtfImage editableWtfImage;
     boolean loaded = false;
     String standardFormat;
     JButton stop;
 
-    LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
+    public LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
         this.panel = panel;
         this.editViewButton = editViewButton;
@@ -67,7 +61,7 @@ public class LoadImage {
         this.editableWtfImage = editableWtfImage;
     }
 
-    EditableWtfImage getEditableWtfImage() {
+    public EditableWtfImage getEditableWtfImage() {
         return editableWtfImage;
     }
 
@@ -314,7 +308,7 @@ public class LoadImage {
         new CreateNewImage(this, builder);
     }
 
-    void onCreateNewImageDone(int valWidth, int valHeight, int valSecondsPerFrame, int valFramePerSeconds, int valFrames, int valChannelWidth, ColorSpace colorspace) throws InterruptedException {
+    public void onCreateNewImageDone(int valWidth, int valHeight, int valSecondsPerFrame, int valFramePerSeconds, int valFrames, int valChannelWidth, ColorSpace colorspace) throws InterruptedException {
         if(valFrames == 1 ) {
             builder.width(valWidth).height(valHeight).frames(valFrames)
                     .channelWidth(valChannelWidth).colorSpace(colorspace);
@@ -331,7 +325,7 @@ public class LoadImage {
         editableWtfImage = wtfImage.edit();
         showImage();
     }
-    void showImage() throws InterruptedException {
+    public void showImage() throws InterruptedException {
         if (imagePanel != null) {
             panel.remove(imagePanel);
         }
@@ -391,11 +385,11 @@ public class LoadImage {
             duration = seconds * 1000;
         }
         imagePanel = new ImagePanel(localImage.animationInformation().frame(0).asJavaImage());
-        /*if(editableWtfImage != null) {
-            imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
-        } else {
-            imagePanel = new ImagePanel(wtfImage.animationInformation().frame(0).asJavaImage());
-        }*/
+            /*if(editableWtfImage != null) {
+                imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
+            } else {
+                imagePanel = new ImagePanel(wtfImage.animationInformation().frame(0).asJavaImage());
+            }*/
         panel.add(imagePanel, BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
@@ -406,11 +400,11 @@ public class LoadImage {
         Timer timer = new Timer(duration, e -> {
             Image next = null;
 
-            /*if(editableWtfImage != null) {
-                next = editableWtfImage.animationInformation().frame(i[0]).asJavaImage();
-            } else {
-                next = wtfImage.animationInformation().frame(i[0]).asJavaImage();
-            }*/
+                /*if(editableWtfImage != null) {
+                    next = editableWtfImage.animationInformation().frame(i[0]).asJavaImage();
+                } else {
+                    next = wtfImage.animationInformation().frame(i[0]).asJavaImage();
+                }*/
             next = localImage.animationInformation().frame(i[0]).asJavaImage();
             imagePanel.setImage(next);
             imagePanel.revalidate();
@@ -442,7 +436,7 @@ public class LoadImage {
         });
     }
 
-    void doSaveImage(BufferedImage image, String extension) {
+    public void doSaveImage(BufferedImage image, String extension) {
         extension = extension.toLowerCase();
 
 

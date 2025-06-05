@@ -1,6 +1,9 @@
-package values;
+package utils;
 
 import java.awt.*;
+/**
+ * Class only consists of public static constants of type Color for unified component colors over the whole project.
+ */
 
 public final class Colors {
     public static final Color BACKGROUND = new Color(110, 100, 100);

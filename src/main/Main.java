@@ -1,8 +1,14 @@
-import values.Colors;
+package main;
+
+import editorview.EditViewButton;
+import editorview.PanelNorth;
+import image.CreateNewImage;
+import image.LoadImage;
+import panel.CreatePanel;
+import utils.Colors;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {

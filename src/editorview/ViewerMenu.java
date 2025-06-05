@@ -1,5 +1,7 @@
-import values.Colors;
-import values.Size;
+package editorview;
+
+import utils.Colors;
+import utils.Size;
 
 import javax.swing.*;
 import java.awt.*;

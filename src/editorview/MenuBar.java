@@ -1,3 +1,5 @@
+package editorview;
+
 import javax.swing.*;
 
 public class MenuBar {

@@ -1,12 +1,14 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.function.BiConsumer;
-import values.Colors;
-import values.Size;
-import wtf.file.api.editable.EditableWtfImage;
+package editorview;
 
-//ähnlich aufgebaut wie LoadImage
-//Hier wird ein neues Panel mit einer MenuBar darin erstellt, in der MenuBar sind 4 Gruppen und jeweiligen Untergruppen, die die Funktion des Editors beschreiben
+import javax.swing.*;
+import java.util.function.BiConsumer;
+
+import panel.CreatePanel;
+import utils.Colors;
+import utils.Size;
+
+//ähnlich aufgebaut wie Image.image.CreateNewImage.LoadImage
+//Hier wird ein neues Panel mit einer editorview.MenuBar darin erstellt, in der editorview.MenuBar sind 4 Gruppen und jeweiligen Untergruppen, die die Funktion des Editors beschreiben
 
 public class FunctionMenu {
     JMenuBar menu;
@@ -15,10 +17,10 @@ public class FunctionMenu {
     static PanelNorth panelNorth;
     //TODO: HInweis:
     //Um die verschiedenen Menus auf Invisible zu stellen benötigen wir globale Variablen, alternativ können mir auch ein JMenu Array erstellen, wenn dir das lieber ist
-    JMenu animationMenu;
-    JMenu colorMenu;
-    JMenu generalMenu;
-    JMenu converterMenu;
+    public JMenu animationMenu;
+    public JMenu colorMenu;
+    public JMenu generalMenu;
+    public JMenu converterMenu;
 
     //Konstruktor
     FunctionMenu(JMenuBar menu, CreatePanel panel, JPanel mainPanel, PanelNorth panelNorth) {

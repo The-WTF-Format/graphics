@@ -1,18 +1,34 @@
-import values.Colors;
-import values.Size;
+package editorview;
+
+import main.Main;
+import panel.CreatePanel;
+import utils.Colors;
+import utils.Size;
+import utils.TransformationType;
+import utils.Visible;
+import wtf.file.api.color.ColorSpace;
+import wtf.file.api.color.ColorSpaceChannels;
+import wtf.file.api.color.channel.ColorChannel;
+import wtf.file.api.editable.EditableWtfImage;
+import wtf.file.api.editable.data.EditableFrame;
+import wtf.file.api.editable.data.EditablePixel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EditViewButton {
     JMenuBar menuBar;
-    PanelNorth panelNorth;
+    public PanelNorth panelNorth;
     JPanel panel;
     JButton viewer;
     JButton editor;
     Boolean editorOfficiallyVisible;
+
     public EditViewButton(JMenuBar menuBar, JPanel panel, PanelNorth panelNorth) {
         this.panel = panel;
         this.panelNorth = panelNorth;
@@ -21,6 +37,7 @@ public class EditViewButton {
         viewerButton();
         editorButton();
     }
+
     public boolean isEditorVisible() {
         return editorOfficiallyVisible;
     }
@@ -106,3 +123,4 @@ public class EditViewButton {
 
     }
 }
+

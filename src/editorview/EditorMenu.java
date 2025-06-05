@@ -1,5 +1,8 @@
-import values.Colors;
-import values.Size;
+package editorview;
+
+import panel.CreatePanel;
+import utils.Colors;
+import utils.Size;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +11,7 @@ public class EditorMenu extends MenuBar{
     JPanel mainPanel;
     PanelNorth panelNorth;
     private CreatePanel panel;
-    FunctionMenu functionMenuEditor;
+    public FunctionMenu functionMenuEditor;
     EditorMenu(JPanel mainPanel, PanelNorth panelNorth) {
         this.mainPanel = mainPanel;
         this.panelNorth = panelNorth;

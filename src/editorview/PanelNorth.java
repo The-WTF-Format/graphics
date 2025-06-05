@@ -1,14 +1,20 @@
+package editorview;
+
+import editorview.EditorMenu;
+import editorview.ViewerMenu;
+import image.CreateNewImage;
+import image.LoadImage;
+
 import javax.swing.*;
-import java.awt.*;
 
 public class PanelNorth {
 
-    JMenuBar editorMenuBar;
-    final JMenuBar viewerMenuBar;
+    public JMenuBar editorMenuBar;
+    public final JMenuBar viewerMenuBar;
     final JPanel mainPanel;
-    LoadImage loadImage;
+    public LoadImage loadImage;
     ViewerMenu viewerMenu;
-    EditorMenu editorMenu;
+    public EditorMenu editorMenu;
 
     public PanelNorth(JPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -17,9 +23,8 @@ public class PanelNorth {
         editorMenu = new EditorMenu(mainPanel, this);
         editorMenuBar = editorMenu.getMenuBar();
     }
-
-    public void setImage(LoadImage loadImage) {
-        this.loadImage = loadImage;
+    public void setImage (LoadImage image) {
+        this.loadImage = image;
     }
 
 }

@@ -1,4 +1,6 @@
-import values.Colors;
+package panel;
+
+import utils.Colors;
 
 import javax.swing.*;
 
