@@ -249,7 +249,6 @@ public class LoadImage {
         if(result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             standardFormat = selectedFile.getName().split("\\.")[1];
-            System.out.println(standardFormat);
             try {
                 image = ImageIO.read(selectedFile);
                 loaded = true;
@@ -444,6 +443,15 @@ public class LoadImage {
         return choice == 0;
     }
 
+    /**
+     * gets all the information about the animation features
+     * iterates through all frames of an animated image and displays the new frame after the given spf or fps
+     * creates a new ImagePanel that draws the frame
+     * @see ImagePanel
+     * @param localImage the loaded image that is animated
+     * @throws InterruptedException
+     */
+
     void showAnimatedImage(WtfImage localImage) throws InterruptedException {
         Visible.setVisible(loadImage);
         if(editViewButton.isEditorVisible()) {
@@ -462,11 +470,6 @@ public class LoadImage {
             duration = seconds * 1000;
         }
         imagePanel = new ImagePanel(localImage.animationInformation().frame(0).asJavaImage());
-            /*if(editableWtfImage != null) {
-                imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
-            } else {
-                imagePanel = new ImagePanel(wtfImage.animationInformation().frame(0).asJavaImage());
-            }*/
         panel.add(imagePanel, BorderLayout.CENTER);
         panel.revalidate();
         panel.repaint();
@@ -475,13 +478,7 @@ public class LoadImage {
         stop.setBackground(Colors.ITEMSPRIMARY);
         lowPanel.add(stop);
         Timer timer = new Timer(duration, e -> {
-            Image next = null;
-
-                /*if(editableWtfImage != null) {
-                    next = editableWtfImage.animationInformation().frame(i[0]).asJavaImage();
-                } else {
-                    next = wtfImage.animationInformation().frame(i[0]).asJavaImage();
-                }*/
+            Image next;
             next = localImage.animationInformation().frame(i[0]).asJavaImage();
             imagePanel.setImage(next);
             imagePanel.revalidate();
@@ -513,20 +510,24 @@ public class LoadImage {
         });
     }
 
+    /**
+     * saves a image by getting a path from the user
+     * can be called from other methodes
+     * @param image BufferedImage that has to be saved
+     * @param extension the Image extension for the image to get saved correctly
+     */
     public void doSaveImage(BufferedImage image, String extension) {
         extension = extension.toLowerCase();
-
-
-        //Fall WTF Image
+        // for a wtf image
         if (extension.equals("wtf")) {
             if (wtfImage != null) {
                 if (editableWtfImage == null) {
                     editableWtfImage = wtfImage.edit();
                 }
                 try {
-                    //Weg zum Speichern wählen
+                    //choose path
                     Path path = getSavingPath(true); // true = WTF Format
-                    //Kompremieren
+                    //compression
                     if (editableWtfImage.width() * editableWtfImage.height() < 50000) {
                         editableWtfImage.save(path);
                     } else {
@@ -545,7 +546,7 @@ public class LoadImage {
                 String pathStr = path.toString();
                 String extLower = extension.toLowerCase();
 
-                // prüft, ob die Datei-Endung bereits vorhanden ist (unabhängig von Groß-/Kleinschreibung)
+                // tests whether there already is an existing path extension for this image (for lower and upper case letters)
                 if (!pathStr.toLowerCase().endsWith("." + extLower)) {
                     pathStr += "." + extLower;
                 }

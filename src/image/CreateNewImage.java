@@ -10,6 +10,11 @@ import utils.Size;
 import utils.Visible;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
+
+/**
+ * manages all the components needed to get all the necessary information about an image to create a new one
+ * saves all the values given by the user
+ */
 public class CreateNewImage {
     CreatePanel integerValuePanel;
     CreatePanel colorSpacePanel;
@@ -31,13 +36,16 @@ public class CreateNewImage {
         this.loadImage = loadImage;
         setPanelsIntegerValues();
     }
+
+    /**
+     * initializes the panel where the JSpinners for all the integer values needed to create a new image are displayed
+     */
     void setPanelsIntegerValues() {
         loadImage.panel.add(integerValuePanel, BorderLayout.CENTER);
         integerValuePanel.setLayout(new GridLayout(3, 4));
         for(int i = 0; i < 12; i++) {
             integerValuePanels[i] = new JPanel();
             integerValuePanel.add(integerValuePanels[i]);
-            //gridPanels[i].setBackground(new Color(20*i, 20*i, 20*i));
             integerValuePanels[i].setBackground(Colors.BACKGROUND);
         }
         setCancel(integerValuePanels[11], integerValuePanel);
@@ -77,6 +85,13 @@ public class CreateNewImage {
             }
         });
     }
+
+    /**
+     * the cancel button used for the IntegerValues and the Colorspace panel
+     * the actionlistener hides the panels and returns to the former state of the GUI
+     * @param gridPanel the panel the cancel button has to be displayed on
+     * @param mainPanel the main panel
+     */
     void setCancel(JPanel gridPanel, CreatePanel mainPanel) {
         JButton cancel = new JButton("cancel");
         cancel.setMinimumSize(Size.BUTTONSIZEMAINMENU);
@@ -99,6 +114,12 @@ public class CreateNewImage {
             }
         });
     }
+
+    /**
+     * creates the conclude button for the colorspace panel
+     * the actionListener calls the onCreateNewImageDOne() methode of
+     * @see LoadImage to create a new image with the values selected by the user
+     */
     void setConclude() {
         JButton save = new JButton("create");
         save.setMinimumSize(Size.BUTTONSIZEMAINMENU);
@@ -133,6 +154,14 @@ public class CreateNewImage {
             }
         });
     }
+
+    /**
+     * places the JSpinners for the user input about
+     * width, height, spf, fps, frames and channel width
+     * on the panel
+     * displayes a warning when the panel is created informing the user about the selection of spf, fps and frames
+     * @see wtf.file.api.impl.WtfImageBuilderImpl
+     */
     void setIntegerValues() {
         for (int i = 0; i < 11; i++) {
             if(i != 0 && i != 3 && i != 4 && i != 7 && i != 8) {
@@ -152,6 +181,10 @@ public class CreateNewImage {
         dialog.setVisible(true);
 
     }
+    /**
+     * places grouped JRadioButtons on the panel for the selection of the colorspace
+     * when one JRadioButton is selected, the value is stored globally
+     */
     void setColorSpace() {
         ButtonGroup buttonGroup = new ButtonGroup();
         ColorSpace[] colorspaces = ColorSpace.values();
@@ -169,6 +202,9 @@ public class CreateNewImage {
         }
 
     }
+    /**
+     * displays warnings when the selected values are not valid
+     */
     boolean checkValidInteger() {
         if(((int) integerValueSpinner[5].getValue() != 0 && (int) integerValueSpinner[6].getValue() != 0) || ((int) integerValueSpinner[5].getValue() == 0 && (int) integerValueSpinner[6].getValue() == 0 && (int) integerValueSpinner[9].getValue() != 1)) {
             JOptionPane.showMessageDialog(integerValuePanel, "For fps and spf: \n\none has to be set to 0\none has to be set to > 0", "Invalid Value", JOptionPane.INFORMATION_MESSAGE);
