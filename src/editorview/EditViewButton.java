@@ -1,26 +1,19 @@
 package editorview;
 
 import main.Main;
-import panel.CreatePanel;
 import utils.Colors;
 import utils.Size;
-import utils.TransformationType;
 import utils.Visible;
-import wtf.file.api.color.ColorSpace;
-import wtf.file.api.color.ColorSpaceChannels;
-import wtf.file.api.color.channel.ColorChannel;
-import wtf.file.api.editable.EditableWtfImage;
-import wtf.file.api.editable.data.EditableFrame;
-import wtf.file.api.editable.data.EditablePixel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
+/**
+ * stores the editor (-button) and the viewer(-button) and the functionality of those buttons
+ * gives information about which button should be visible in this state
+ */
 public class EditViewButton {
     JMenuBar menuBar;
     public PanelNorth panelNorth;
@@ -42,6 +35,11 @@ public class EditViewButton {
         return editorOfficiallyVisible;
     }
 
+    /**
+     * initializes the viewer button, actionlistener and the main visibility
+     * and whether the viewermenu should be visible
+     * @see ViewerMenu
+     */
     private void viewerButton() {
         viewer = new JButton("Switch to viewer");
         ImageIcon viewIcon = new ImageIcon(Main.class.getResource("/icons/view.png"));
@@ -75,17 +73,15 @@ public class EditViewButton {
         return viewer;
     }
 
-    public void setViewer(JButton viewer) {
-        this.viewer = viewer;
-    }
 
     public JButton getEditor() {
         return editor;
     }
-
-    public void setEditor(JButton editor) {
-        this.editor = editor;
-    }
+    /**
+     * initializes the editor button, actionlistener and the main visibility
+     * and whether the editormenu should be visible
+     * @see EditorMenu
+     */
 
     private void editorButton() {
         editor = new JButton("Switch to editor");
@@ -106,8 +102,9 @@ public class EditViewButton {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (panelNorth.editorMenuBar == null) {
-                    JOptionPane.showMessageDialog(null, "Bitte zuerst ein Bild laden!", "Editor nicht verfügbar", JOptionPane.WARNING_MESSAGE);
-                    return; // beende Action
+                    JOptionPane.showMessageDialog(null, "Please load a image before editing!", "Editor not available ", JOptionPane.WARNING_MESSAGE);
+                    return;
+                    // end this action, nothing happens
                 }
 
                 Visible.setInvisible(editor, panelNorth.viewerMenuBar);

@@ -1,32 +1,15 @@
 package image;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Objects;
-
-import editorview.EditViewButton;
-import panel.BufferedImagePanel;
 import panel.CreatePanel;
-import panel.ImagePanel;
 import utils.Colors;
 import utils.Size;
 import utils.Visible;
-import wtf.file.api.WtfImage;
-import wtf.file.api.WtfLoader;
 import wtf.file.api.builder.WtfImageBuilder;
 import wtf.file.api.color.ColorSpace;
-import wtf.file.api.editable.EditableWtfImage;
-import wtf.file.api.editable.compression.DataCompressionType;
-import wtf.file.api.exception.WtfException;
-
 public class CreateNewImage {
     CreatePanel integerValuePanel;
     CreatePanel colorSpacePanel;

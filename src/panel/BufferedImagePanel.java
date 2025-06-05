@@ -4,12 +4,19 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import utils.Colors;
 public class BufferedImagePanel extends ImagePanel {
+    /**
+     * to draw the (non-wtf) image correctly
+     */
     private final BufferedImage bufferedImage;
     public BufferedImagePanel(BufferedImage bufferedImage) {
         super();
         this.bufferedImage = bufferedImage;
         this.setBackground(Colors.BACKGROUND);
     }
+    /**
+     * draw the (non-wtf) image and the calculation of the proportions
+     * @param g the <code>Graphics</code> object to protect
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

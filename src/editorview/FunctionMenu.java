@@ -12,8 +12,7 @@ import utils.Size;
 
 public class FunctionMenu {
     JMenuBar menu;
-    CreatePanel panel;
-    static JPanel mainPanel;
+    static CreatePanel mainPanel;
     static PanelNorth panelNorth;
     //TODO: HInweis:
     //Um die verschiedenen Menus auf Invisible zu stellen benötigen wir globale Variablen, alternativ können mir auch ein JMenu Array erstellen, wenn dir das lieber ist
@@ -23,9 +22,8 @@ public class FunctionMenu {
     public JMenu converterMenu;
 
     //Konstruktor
-    FunctionMenu(JMenuBar menu, CreatePanel panel, JPanel mainPanel, PanelNorth panelNorth) {
+    FunctionMenu(JMenuBar menu, CreatePanel mainPanel, PanelNorth panelNorth) {
         this.menu = menu;
-        this.panel = panel;
         this.mainPanel = mainPanel;
         this.panelNorth = panelNorth;
         addMenus();

@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import utils.Colors;
 
+/**
+ * to draw the (wtf) image correctly
+ */
 public class ImagePanel extends JPanel {
     Image image;
     public ImagePanel(Image image) {
@@ -16,6 +19,11 @@ public class ImagePanel extends JPanel {
     public ImagePanel() {
         this.setBackground(Colors.BACKGROUND);
     }
+
+    /**
+     * draw the (wtf) image and the calculation of the proportions
+     * @param g the <code>Graphics</code> object to protect
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -37,7 +45,6 @@ public class ImagePanel extends JPanel {
         int y = 5 + (availableHeight - scaledHeight) / 2;
 
         g.drawImage(image, x, y, scaledWidth, scaledHeight, this);
-        //g.drawImage(image, x, y, image.getWidth(this)*100, image.getHeight(this)*100, this);
 
     }
 }

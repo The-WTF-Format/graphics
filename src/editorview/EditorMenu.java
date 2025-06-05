@@ -7,17 +7,23 @@ import utils.Size;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * manages/initalizes the functions of the editor
+ */
 public class EditorMenu extends MenuBar{
-    JPanel mainPanel;
     PanelNorth panelNorth;
-    private CreatePanel panel;
+    private final CreatePanel mainPanel;
     public FunctionMenu functionMenuEditor;
-    EditorMenu(JPanel mainPanel, PanelNorth panelNorth) {
+    EditorMenu(CreatePanel mainPanel, PanelNorth panelNorth) {
         this.mainPanel = mainPanel;
         this.panelNorth = panelNorth;
         addMenu();
 
     }
+
+    /**
+     * initializes the editor menubar
+     */
     private void addMenu() {
         menuBar = new JMenuBar();
         menuBar.setPreferredSize(new Dimension(Size.SECONDARYMENUBAR));
@@ -26,11 +32,15 @@ public class EditorMenu extends MenuBar{
 
         addComponents();
     }
+
+    /**
+     * sets the background color and the layout of the editor menubar
+     * initializes the functionMenuEditor with all the buttons and features of the editor
+     * @see FunctionMenu
+     */
     private void addComponents() {
         menuBar.setLayout(new FlowLayout());
         menuBar.setBackground(Colors.MENUBARBACKGROUND);
-
-        //hier wird die zweite Menuleiste mit DropDown beschrieben
-        functionMenuEditor = new FunctionMenu(menuBar, panel, mainPanel, panelNorth);
+        functionMenuEditor = new FunctionMenu(menuBar, mainPanel, panelNorth);
     }
 }

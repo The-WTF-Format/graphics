@@ -27,10 +27,17 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 
+/**
+ * stores all the most general image functions:
+ * - load the image ...
+ * ... in 3 different ways
+ * - save the image
+ */
 public class LoadImage {
     public JButton saveButton;
     JMenuBar menu;
     public JMenu loadImage;
+
     public CreatePanel panel;
     JPanel lowPanel;
     ImagePanel imagePanel;
@@ -46,30 +53,26 @@ public class LoadImage {
     String standardFormat;
     JButton stop;
 
+    /**
+     * initializes an LoadImage object and calls the methode addMenu()
+     * @param menu the main menuBar
+     * @param panel the main panel
+     * @param editViewButton the object that managed the view and the editor buttons
+     */
     public LoadImage(JMenuBar menu, CreatePanel panel, EditViewButton editViewButton) {
         this.menu = menu;
         this.panel = panel;
         this.editViewButton = editViewButton;
         addMenu();
     }
-
-    void setImagePanel(Image image) {
-        this.imagePanel = new ImagePanel(image);
-    }
-
-    void setEditableWtfImage(EditableWtfImage editableWtfImage) {
-        this.editableWtfImage = editableWtfImage;
-    }
-
     public EditableWtfImage getEditableWtfImage() {
         return editableWtfImage;
     }
 
-    ImagePanel getImagePanel() {
-        return this.imagePanel;
-    }
-
-
+    /**
+     * the menu for the different ways of loading a image
+     * calls the methods addMenuItems and saveImage
+     */
     private void addMenu() {
         loadImage = new JMenu("Load image");
         loadImage.setPreferredSize(Size.BUTTONSIZEMAINMENU);
@@ -80,12 +83,21 @@ public class LoadImage {
         saveImage();
     }
 
+    /**
+     * calls methods
+     */
     private void addMenuItems() {
         addPathItem();
         addCreateItem();
         getNormalImageByPath();
     }
 
+    /**
+     * initializes the JMenuItem for "create new image"
+     * the function of its actionListener that calls WtfLoader.by() and
+     * createNewImage(builder) that initializes a new CreateNewImage object
+     * @see CreateNewImage
+     */
     private void addCreateItem() {
         createNewImage = new JMenuItem("create new image");
         loadImage.add(createNewImage);
@@ -96,6 +108,9 @@ public class LoadImage {
                 if(imagePanel != null) {
                     if (unsavedWarning()) {
                         return;
+                        /**
+                         * the user decide to cancel this operation, because there is already a loaded image
+                         */
                     }
                     if(wtfImage.animationInformation().isAnimated()) {
                         Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
@@ -117,7 +132,12 @@ public class LoadImage {
             }
         });
     }
-
+    /**
+     * initializes the JMenuItem for "WTF by path"
+     * the function of its actionListener that calls WtfLoader.from() by handling over a path
+     * calls the methode showImage()
+     * only usable for wtf images
+     */
     private void addPathItem() {
         byPath = new JMenuItem("WTF by path");
         loadImage.add(byPath);
@@ -128,6 +148,9 @@ public class LoadImage {
                 if(imagePanel != null) {
                     if (unsavedWarning()) {
                         return;
+                        /**
+                         * the user decide to cancel this operation, because there is already a loaded image
+                         */
                     }
                     if(wtfImage.animationInformation().isAnimated()) {
                         Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
@@ -165,7 +188,12 @@ public class LoadImage {
             }
         });
     }
-
+    /**
+     * initializes the JMenuItem for "get standard format Image"
+     * the function of its actionListener that loads the image by its path as a bufferedImage
+     * calls the methode showImage()
+     * only usable for non-wtf images
+     */
     private void getNormalImageByPath() {
         normalImage = new JMenuItem("get standard format Image");
         loadImage.add(normalImage);
@@ -176,6 +204,9 @@ public class LoadImage {
                 if(imagePanel != null) {
                     if (unsavedWarning()) {
                         return;
+                        /**
+                         * the user decide to cancel this operation, because there is already a loaded image
+                         */
                     }
                     if(wtfImage.animationInformation().isAnimated()) {
                         Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
@@ -205,13 +236,16 @@ public class LoadImage {
 
     }
 
+    /**
+     * gets the path of a non wtf image and saves the image as the Bufferedimage image
+     */
     private void getNewImage() {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Bild auswählen");
+        fileChooser.setDialogTitle("Select image");
         fileChooser.setFileFilter(new FileNameExtensionFilter(null, "jpg", "png", "jpeg"));
 
         int result = fileChooser.showOpenDialog(panel);
-        //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
+        //State: if the User opened a file or canceled the operation or an error occurred
         if(result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             standardFormat = selectedFile.getName().split("\\.")[1];
@@ -226,14 +260,15 @@ public class LoadImage {
         }
     }
 
+    /**
+     * @return the path for a WTFImage to load
+     */
     private Path getNewPath() {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Bild auswählen");
+        fileChooser.setDialogTitle("Select image");
         fileChooser.setFileFilter(new FileNameExtensionFilter(null, "wtf"));
-        //TODO all possible formats
 
         int result = fileChooser.showOpenDialog(panel);
-        //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
         if(result == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile().toPath();
         }
@@ -241,11 +276,17 @@ public class LoadImage {
         return null;
 
     }
+
+    /**
+     * gets the path for a wtf or a non wtf image to be saved
+     * it adds the format extension of each format
+     * @param isWTFImage gives information whether the image is a wtf or w non wtf image
+     * @return the path of the image to be saved
+     */
     private Path getSavingPath(Boolean isWTFImage) {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Pfad auswählen");
+        fileChooser.setDialogTitle("Choose path");
         int result = fileChooser.showOpenDialog(panel);
-        //Zustand: ob der Benutzer eine Datei geöffnet hat, oder abgebrochen hat oder ein Fehler aufgetreten ist
         if(result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             String fileName = selectedFile.getName();
@@ -259,8 +300,15 @@ public class LoadImage {
         }
         return null;
     }
+
+    /**
+     * the button and the actionListener to save an image
+     * calls doSaveImage();
+     * manages the visibility of different Swing components
+     * sets all variables that store information about the current image to null
+     */
     private void saveImage() {
-        saveButton = new JButton("save Image");
+        saveButton = new JButton("save image");
         saveButton.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         saveButton.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         saveButton.setMaximumSize(Size.BUTTONSIZEMAINMENU);
@@ -304,10 +352,28 @@ public class LoadImage {
         });
 
     }
+
+    /**
+     * initializes a new CreateNewImage object
+     * @see CreateNewImage
+     */
     private void createNewImage(WtfImageBuilder builder) {
         new CreateNewImage(this, builder);
     }
 
+    /**
+     * gets the parameter that were set in
+     * @see CreateNewImage from the user to create a new image
+     * calls showImage()
+     * @param valWidth
+     * @param valHeight
+     * @param valSecondsPerFrame
+     * @param valFramePerSeconds
+     * @param valFrames
+     * @param valChannelWidth
+     * @param colorspace
+     * @throws InterruptedException when a invalid parameter was set
+     */
     public void onCreateNewImageDone(int valWidth, int valHeight, int valSecondsPerFrame, int valFramePerSeconds, int valFrames, int valChannelWidth, ColorSpace colorspace) throws InterruptedException {
         if(valFrames == 1 ) {
             builder.width(valWidth).height(valHeight).frames(valFrames)
@@ -325,6 +391,14 @@ public class LoadImage {
         editableWtfImage = wtfImage.edit();
         showImage();
     }
+
+    /**
+     * manages the visibility of an image depending on the image being animated or not
+     * calls showAnimatedImage() when the image is animated
+     * creates an ImagePanel object that draws the image
+     * @see ImagePanel
+     * @throws InterruptedException
+     */
     public void showImage() throws InterruptedException {
         if (imagePanel != null) {
             panel.remove(imagePanel);
@@ -334,8 +408,6 @@ public class LoadImage {
         if(editableWtfImage != null) {
             if(editableWtfImage.animationInformation().isAnimated()) {
                 showAnimatedImage(editableWtfImage);
-                //imagePanel = new ImagePanel(editableWtfImage.animationInformation().frame(0).asJavaImage());
-                //panel.add(imagePanel, BorderLayout.CENTER);
             } else {
                 Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.animationMenu);
                 imagePanel = new ImagePanel(editableWtfImage.asJavaImage());
@@ -353,6 +425,11 @@ public class LoadImage {
         panel.revalidate();
         panel.repaint();
     }
+
+    /**
+     * displays a warning saying that you are about to call a new image, although there is already a loaded image
+     * @return false when the user clicks on "return" and excepts that the current image will be deleted
+     */
     boolean unsavedWarning() {
         int choice = JOptionPane.showOptionDialog(
                 null,
