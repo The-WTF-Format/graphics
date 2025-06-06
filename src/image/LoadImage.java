@@ -501,7 +501,7 @@ public class LoadImage {
                 if(editViewButton.isEditorVisible()) {
                     Visible.setVisible(editViewButton.getViewer(), editViewButton.panelNorth.editorMenuBar, saveButton, loadImage);
                 } else {
-                    Visible.setVisible(editViewButton.getEditor(), saveButton, loadImage);
+                    Visible.setVisible(editViewButton.getEditor(), editViewButton.panelNorth.editorMenuBar, saveButton, loadImage);
                 }
                 Visible.setInvisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
                         editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,

@@ -180,7 +180,7 @@ public class ImageFunction {
         if(panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
         }
-        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage, panelNorth.loadImage.editViewButton.editor, panelNorth.editorMenuBar, panelNorth.loadImage.editViewButton.viewer);
         CreatePanel colorPickerPanel = new CreatePanel();
         colorPickerPanel.setPreferredSize(new Dimension(200, 50));
         colorPickerPanel.setLayout(new GridLayout(8, 1));
@@ -216,6 +216,11 @@ public class ImageFunction {
         });
         closePanel.addActionListener( x -> {
             Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+            if(panelNorth.loadImage.editViewButton.isEditorVisible()) {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.editor, panelNorth.editorMenuBar);
+            } else {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.viewer);
+            }
             mainPanel.remove(colorPickerPanel);
             mainPanel.revalidate();
             mainPanel.repaint();
@@ -270,7 +275,8 @@ public class ImageFunction {
         if(panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
         }
-        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+        Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage,
+                panelNorth.loadImage.editViewButton.editor, panelNorth.editorMenuBar, panelNorth.loadImage.editViewButton.viewer);
         CreatePanel invert = new CreatePanel();
         invert.setPreferredSize(new Dimension(200, 50));
         invert.setLayout(new GridLayout(8, 1));
@@ -315,6 +321,11 @@ public class ImageFunction {
         JButton closeButton = new JButton("close");
         closeButton.addActionListener( x -> {
             Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+            if(panelNorth.loadImage.editViewButton.isEditorVisible()) {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.editor, panelNorth.editorMenuBar);
+            } else {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.viewer);
+            }
             mainPanel.remove(invert);
             mainPanel.revalidate();
             mainPanel.repaint();
