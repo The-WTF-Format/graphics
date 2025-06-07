@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * manages/initalizes the functions of the editor
+ * manages/initializes the functions of the editor
  */
 public class EditorMenu extends MenuBar{
     PanelNorth panelNorth;

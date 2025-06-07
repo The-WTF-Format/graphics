@@ -21,6 +21,12 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Handels image editing functions for the WTF image editor
+ * Fuction: resizing, rotating, mirroring, color space conversion, pixel manipulation and format conversion
+ * @see EditableWtfImage
+ * @see TransformationType
+ */
 
 public class ImageFunction {
 
@@ -38,14 +44,11 @@ public class ImageFunction {
         this.mainPanel = mainPanel;
         this.loadimage = panelNorth.loadImage;
 
-        //ToDo panel wird mit Null übergeben -> muss gefixt werden, sonst wird bild nicht übergeben
-
         if (panelNorth == null || panelNorth.loadImage == null) {
             System.out.println("no imagepanel loaded!");
         }
         if (panelNorth != null) {
             if (panelNorth.loadImage != null) {
-                //todo delete -> editing this will not change the actual visible image
                 editable = panelNorth.loadImage.getEditableWtfImage();
             }
         }
@@ -54,19 +57,25 @@ public class ImageFunction {
         }
     }
 
-    //-----------Funktionen für FUnction Menu-------------//
+    /**
+     * Following Function are connected to the ActionRouter in FunctionMenu
+     */
+
+    /**
+     * Opens a popup window to enter new height and with of the image
+     * @see #changeWTFImageWidth(int)
+     * @see #changeWTFImageHeight(int)
+     */
     public void setEditableHeightWidth() {
-        //neues Fenster erstellen
-        JDialog dialog = new JDialog((Frame) null, "Höhe und Breite ändern", true);
+        JDialog dialog = new JDialog((Frame) null, "Change Height width", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setSize(300, 200);
         dialog.setLayout(new BorderLayout());
 
-        // Panel für Eingabefelder
         JPanel inputPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        JLabel heightLabel = new JLabel("Neue Höhe:");
+        JLabel heightLabel = new JLabel("new height:");
         JTextField heightField = new JTextField();
-        JLabel widthLabel = new JLabel("Neue Breite:");
+        JLabel widthLabel = new JLabel("new width:");
         JTextField widthField = new JTextField();
 
         inputPanel.add(heightLabel);
@@ -74,11 +83,8 @@ public class ImageFunction {
         inputPanel.add(widthLabel);
         inputPanel.add(widthField);
 
-        // OK-Button
-        JButton okButton = new JButton("Übernehmen");
-        //TODO: Bitte auf englisch übersetzten
+        JButton okButton = new JButton("Accept");
         okButton.addActionListener(e -> {
-            //Abfrage ob editable bereits vorhanden, sonst anlegen
             if(panelNorth.loadImage.editableWtfImage == null) {
                 panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
             }
@@ -87,38 +93,55 @@ public class ImageFunction {
                 int height = Integer.parseInt(heightField.getText().trim());
                 int width = Integer.parseInt(widthField.getText().trim());
 
-                //Methode aufrufen
                 changeWTFImageWidth(width);
                 changeWTFImageHeight(height);
 
                 dialog.dispose();
             } catch (NumberFormatException ex) {
-                //TODO: Bitte auf englisch übersetzten
-                JOptionPane.showMessageDialog(dialog, "Bitte gültige Zahlen eingeben!", "Fehler", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "Please enter valid number!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        //Interface zusammensetzen
         dialog.add(inputPanel, BorderLayout.CENTER);
         dialog.add(okButton, BorderLayout.SOUTH);
         dialog.setLocationRelativeTo(null); // zentrieren
         dialog.setVisible(true);
     }
 
+    /**
+     * Shows the rotation transformation panel
+     * @see #showTransformationPanel(TransformationType...)
+     * @see TransformationType#ROTATE_CLOCKWISE
+     * @see TransformationType#ROTATE_COUNTERCLOCKWISE
+     */
     public void rotateEditable() {
+        panelVisibility(false);
         showTransformationPanel(
                 TransformationType.ROTATE_COUNTERCLOCKWISE,
                 TransformationType.ROTATE_CLOCKWISE
         );
     }
 
+    /**
+     * Shows the mirror transformation panel
+     * @see #showTransformationPanel(TransformationType...)
+     * @see TransformationType#FLIP_HORIZONTAL
+     * @see TransformationType#FLIP_HORIZONTAL
+     */
     public void mirrorEditable() {
+        panelVisibility(false);
         showTransformationPanel(
                 TransformationType.FLIP_HORIZONTAL,
                 TransformationType.FLIP_VERTICAL
         );
     }
 
+    /**
+     * Opens a dialog for selecting and applying a new color space to the image.
+     * Presents all available color spaces as radio buttons and applies the selection.
+     * Automatically creates an editable image if none exists.
+     * @see ColorSpace
+     */
     protected void colorSpaceSelection() {
         JDialog dialog = new JDialog((Frame) null, "Choose colorspace", true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -176,6 +199,12 @@ public class ImageFunction {
         dialog.setVisible(true);
     }
 
+    /**
+     * Opens a color picker interface for examining pixel values at specific coordinates.
+     * Allows viewing color channel values and provides option to invert selected pixel.
+     * Creates coordinate input fields and displays pixel information dialog.
+     * @see #invertColor(EditablePixel)
+     */
     protected void colorPicker() {
         if(panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
@@ -271,6 +300,12 @@ public class ImageFunction {
 
     }
 
+    /**
+     * Opens a simplified interface for inverting colors at specific coordinates.
+     * Provides coordinate input and direct color inversion functionality.
+     * Hides other UI elements while active.
+     * @see #invertColor(EditablePixel)
+     */
     protected void invertColorPopUp() {
         if(panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
@@ -336,6 +371,13 @@ public class ImageFunction {
         mainPanel.repaint();
     }
 
+    /**
+     * Converts the current editable image to the specified format and saves it.
+     * Handles alpha channel compatibility and creates appropriate BufferedImage.
+     * JPEG format automatically removes alpha channel for compatibility.
+     * @param extension the target file format (e.g., "JPEG", "PNG")
+     * @see LoadImage#doSaveImage(BufferedImage, String)
+     */
     public void converter(String extension) {
         if (panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
@@ -376,38 +418,25 @@ public class ImageFunction {
         panelNorth.loadImage.doSaveImage(bufferedImage, extension);
     }
 
-    // ----------Methoden zum Panel herzeigen----------//
-    protected void showTransformationPanel(TransformationType... transformations) {
-        CreatePanel gridPanel = new CreatePanel();
-        gridPanel.setLayout(new FlowLayout());
-        gridPanel.setBackground(Color.LIGHT_GRAY);
-        gridPanel.setPreferredSize(new Dimension(200, 50));
 
-        if(panelNorth.loadImage.editableWtfImage == null) {
-            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
-        }
+    /**
+     * Privats Methods for editing image
+     */
 
-        // Buttons basierend auf den übergebenen Transformationen erstellen
-        for (TransformationType transformation : transformations) {
-            JButton button = createTransformationButton(transformation);
-            gridPanel.add(button);
-        }
+    /**
+     * Transformation
+     */
 
-        JButton closeButton = new JButton("✕ Schließen");
-        closeButton.addActionListener(e -> closePanelInEast());
-        gridPanel.add(closeButton);
-
-        // Panel anzeigen
-        showPanelInEast(gridPanel);
-    }
-
-    //------------private Methods----------------//
-    //Transform
+    /**
+     * Changes the height of the editable image to the specified value.
+     * Refreshes the image display after modification.
+     * @param newHeight the new height in pixels
+     * @throws RuntimeException if image display refresh fails
+     * @see EditableWtfImage#setHeight(int)
+     */
     protected void changeWTFImageHeight(int newHeight) {
         panelNorth.loadImage.editableWtfImage.setHeight(newHeight);
-        System.out.println("Neue Höhe: " + panelNorth.loadImage.editableWtfImage.height());
         try {
-            //Neues Bild muss ins Panel geladen werden
             panelNorth.loadImage.showImage();
 
         } catch (InterruptedException e) {
@@ -415,18 +444,31 @@ public class ImageFunction {
         }
     }
 
+    /**
+     * Changes the width of the editable image to the specified value.
+     * Refreshes the image display after modification.
+     * @param newWidth the new width in pixels
+     * @throws RuntimeException if image display refresh fails
+     * @see EditableWtfImage#setWidth(int)
+     */
     protected void changeWTFImageWidth(int newWidth) {
-        //Höhe ändern
         panelNorth.loadImage.editableWtfImage.setWidth(newWidth);
-        System.out.println("Neue Höhe: " + panelNorth.loadImage.editableWtfImage.height());
         try {
-            //Neues Bild muss ins Panel geladen werden
             panelNorth.loadImage.showImage();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Applies the specified transformation to the entire image.
+     * Handles rotation and mirroring operations by manipulating pixel arrays.
+     * Creates temporary storage for pixel values to prevent data corruption during transformation.
+     * @param type the transformation type to apply
+     * @throws IllegalArgumentException if transformation type is unknown
+     * @see TransformationType
+     * @see #ensureHSVChannels(Map)
+     */
     protected void transform(TransformationType type) {
         if (panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
@@ -437,51 +479,43 @@ public class ImageFunction {
             int width = original[0].length;
             int height = original.length;
 
-            //Temporärer Map für ColorChannel
             Map<ColorChannel, Short>[][] tempValues = new Map[height][width];
 
-            //Alle Pixel-Werte in temporäres Array kopieren MIT Default-Werten
+
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     Map<ColorChannel, Short> originalValues = original[y][x].values();
                     Map<ColorChannel, Short> completeValues = new HashMap<>();
 
-                    // Alle Original-Werte kopieren
                     completeValues.putAll(originalValues);
 
-                    // Fehlende HSV-Kanäle mit Default-Werten ergänzen
                     ensureHSVChannels(completeValues);
 
                     tempValues[y][x] = completeValues;
                 }
             }
 
-            //Rotierte Werte zurück in die Pixel schreiben
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     int newY, newX;
 
                     switch (type) {
                         case ROTATE_CLOCKWISE:
-                            // 90° rechts: (x,y) -> (y, width-1-x)
                             newY = x;
                             newX = height - 1 - y;
                             break;
 
                         case ROTATE_COUNTERCLOCKWISE:
-                            // 90° links: (x,y) -> (height-1-x, y)
                             newY = width - 1 - x;
                             newX = y;
                             break;
 
                         case FLIP_HORIZONTAL:
-                            // Horizontal spiegeln: (x,y) -> (width-1-x, y)
                             newY = y;
                             newX = width - 1 - x;
                             break;
 
                         case FLIP_VERTICAL:
-                            // Vertikal spiegeln: (x,y) -> (x, height-1-y)
                             newY = height - 1 - y;
                             newX = x;
                             break;
@@ -503,15 +537,37 @@ public class ImageFunction {
         }
     }
 
-    //Animiation
+    /**
+     * Animation
+     */
+
+    /**
+     * Opens a dialog to set seconds per frame for animation information.
+     * Validates input range (0-127) and applies the setting to the editable image.
+     * @see #frames(String, String)
+     * @see EditableWtfImage#animationInformation()
+     */
     protected void secondsPerFrames() {
         frames("Seconds per frame", "Seconds per frame (0 - 127)");
     }
 
+    /**
+     * Opens a dialog to set frames per second for animation information.
+     * Validates input range (0-127) and applies the setting to the editable image.
+     * @see #frames(String, String)
+     * @see EditableWtfImage#animationInformation()
+     */
     protected void framesPerSeconds() {
         frames("Frames per seconds", "Frames per seconds (0 - 127)");
     }
 
+
+    /**
+     * Creates and displays a dialog for setting animation frame parameters.
+     * Provides input validation and applies the setting based on the header type.
+     * @param header the dialog title and parameter type identifier
+     * @param text the descriptive text for the input field
+     */
     private void frames(String header, String text) {
         JDialog dialog = new JDialog((Frame) null, header, true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -539,10 +595,8 @@ public class ImageFunction {
                     }
                     if(header.equals("Seconds per frame")) {
                         panelNorth.loadImage.editableWtfImage.animationInformation().setSecondsPerFrame((int) spinner.getValue());
-                        System.out.println("Neue Seconds per frame: " + panelNorth.loadImage.editableWtfImage.animationInformation().secondsPerFrame());
                     } else {
                         panelNorth.loadImage.editableWtfImage.animationInformation().setFramesPerSecond((int) spinner.getValue());
-                        System.out.println("Neue Frames per second: " + panelNorth.loadImage.editableWtfImage.animationInformation().framesPerSecond());
                     }
                     dialog.dispose();
                     try {
@@ -560,27 +614,29 @@ public class ImageFunction {
         dialog.setVisible(true);
     }
 
-    //Color
-    //-----Invertierung Methode-----//
-    //Pixel wird übergeben und ColorSpace wird abgefragt
-    //Bei HSV muss nur der Channel HUE um 180 gedreht werden
-    //Bei anderen Spaces wird
+    /**
+     * Color
+     */
+
+    /**
+     * Inverts the color values of the specified pixel based on its color space.
+     * For HSV color spaces, rotates HUE by 180 degrees while preserving saturation and value.
+     * For other color spaces, inverts all color channels except alpha.
+     * Refreshes the image display after modification.
+     * @param pixel the pixel to invert
+     * @see ColorSpace
+     * @see ColorSpaceChannels
+     */
     private void invertColor(EditablePixel pixel) {
-        //new Map fürs Invertieren erstellen
         Map <ColorChannel, Short> newMap = new HashMap<>();
-        //aktueller ColorSpace
         ColorSpace colorSpace = pixel.colorSpace();
 
-        // Maximalen Wert für die aktuelle Bit-Tiefe berechnen
         short maxValue = (short) (Math.pow(2, panelNorth.loadImage.editableWtfImage.channelWidth()) -1);
 
         if (colorSpace == ColorSpace.HSV ||
                 colorSpace == ColorSpace.HSVa ||
                 colorSpace == ColorSpace.DYNAMIC_HSVa) {
-            //HUE muss um 180° gedreht werden
             for (ColorChannel c : pixel.values().keySet()) {
-                //Nur HUE Channel drehen, SAT und VAL bleiben gleich, da es sonst zu zu dunklen Pixel kommen kann
-                //trotzdem durch alle Channels durchloopen, da sonst SAT und VAl durch Map auf 0 gesetzt werden -> ungewünschter Farbeffekt
                 if (c.equals(ColorSpaceChannels.HUE)) {
                     short invertedValue = (short) ((pixel.valueOf(c) + (maxValue + 1) / 2) % (maxValue + 1));
                     newMap.put(c, invertedValue);
@@ -590,24 +646,17 @@ public class ImageFunction {
                 }
             }
         } else {
-
-            // Standard-Inversion: Alle Farbkanäle (außer Alpha) invertieren
             for (ColorChannel c : pixel.values().keySet()) {
                 if (!c.name().equals("alpha")) {
-                    // Farbkanal invertieren
                     short invertedValue = (short) (maxValue - pixel.valueOf(c));
                     newMap.put(c, invertedValue);
                 } else {
-                    // Alpha unverändert
                     newMap.put(c, pixel.valueOf(c));
 
                 }
             }
         }
-        //Invertierung auf Pixel anwenden
         pixel.setValues(newMap);
-
-        //Bild aktualisieren
         try {
             panelNorth.loadImage.showImage();
         } catch (InterruptedException ex) {
@@ -616,11 +665,14 @@ public class ImageFunction {
 
     }
 
-    //-------------------Hilfefunktionen für NullWerte im Channels----------------//
-    //manche Pixel können null Werte im ColorChannel haben - Probleme mit Java-Image dann beim Darstellen
-    //Funktion sucht null Werte und ersetzt sie mit sinnevolle Deafult Werte
+
+    /**
+     * Ensures HSV color channels have valid default values to prevent null pointer exceptions.
+     * Sets default values: HUE=0 (red), SATURATION=0 (gray), VALUE=255 (bright), ALPHA=255 (opaque).
+     * Required for proper Java image conversion and display.
+     * @param values the color channel map to validate and fill
+     */
     private void ensureHSVChannels(Map<ColorChannel, Short> values) {
-        // Suche nach HSV-Kanälen (DynamicColorChannel) welche gibt es überhaupt
         ColorChannel hueChannel = null;
         ColorChannel saturationChannel = null;
         ColorChannel valueChannel = null;
@@ -639,7 +691,6 @@ public class ImageFunction {
             }
         }
 
-        // Default-Werte setzen falls Kanäle fehlen
         if (hueChannel != null && values.get(hueChannel) == null) {
             values.put(hueChannel, (short) 0); // Default Hue = 0 (rot)
         }
@@ -654,7 +705,43 @@ public class ImageFunction {
         }
     }
 
-    //----------------- Hilfsmethode für Panel-Management------------------//
+    /**
+     * Methods for Panels
+     */
+
+    /**
+     * shows panel with the specified transformation options
+     * create button for types and handels visibility
+     * @param transformations
+     */
+    protected void showTransformationPanel(TransformationType... transformations) {
+        CreatePanel gridPanel = new CreatePanel();
+        gridPanel.setLayout(new FlowLayout());
+        gridPanel.setBackground(Color.LIGHT_GRAY);
+        gridPanel.setPreferredSize(new Dimension(200, 50));
+
+        if(panelNorth.loadImage.editableWtfImage == null) {
+            panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
+        }
+
+        for (TransformationType transformation : transformations) {
+            JButton button = createTransformationButton(transformation);
+            gridPanel.add(button);
+        }
+
+        JButton closeButton = new JButton("✕ close");
+        closeButton.addActionListener(e -> closePanelInEast());
+        gridPanel.add(closeButton);
+
+        showPanelInEast(gridPanel);
+    }
+
+    /**
+     * Displays the specified panel in the east region of the main panel.
+     * Removes any existing east panel and hides save/load buttons during operation.
+     * @param panel the panel to display in the east region
+     * @see BorderLayout
+     */
     private void showPanelInEast(JPanel panel) {
         if (mainPanel.getLayout() instanceof BorderLayout) {
             BorderLayout layout = (BorderLayout) mainPanel.getLayout();
@@ -669,31 +756,31 @@ public class ImageFunction {
         mainPanel.repaint();
     }
 
-    //------------------Hilfsmethode um Buttons zu erstellen----------------------//
-    private JButton createTransformationButton(TransformationType transformation) {
-        String text;
-        switch (transformation) {
-            case ROTATE_CLOCKWISE:
-                text = "↷ Rechts";
-                break;
-            case ROTATE_COUNTERCLOCKWISE:
-                text = "↶ Links";
-                break;
-            case FLIP_HORIZONTAL:
-                text = "↔ Horizontal";
-                break;
-            case FLIP_VERTICAL:
-                text = "↕ Vertikal";
-                break;
-            default:
-                text = transformation.toString();
+    /**
+     * Controls the visibility of main UI components based on the current operation state.
+     * Shows or hides save button, load button, editor, menu bar, and viewer components.
+     * @param klick true to show components, false to hide them
+     */
+    private void panelVisibility(boolean klick) {
+        if(klick) {
+            Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+            if(panelNorth.loadImage.editViewButton.isEditorVisible()) {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.editor, panelNorth.editorMenuBar);
+            } else {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.viewer);
+            }
+        } else {
+            Visible.setInvisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage,
+                    panelNorth.loadImage.editViewButton.editor, panelNorth.editorMenuBar, panelNorth.loadImage.editViewButton.viewer);
         }
 
-        JButton button = new JButton(text);
-        button.addActionListener(e -> transform(transformation));
-        return button;
     }
 
+    /**
+     * Closes and removes the panel from the east region of the main layout.
+     * Restores visibility of save and load buttons after panel closure.
+     * @see #panelVisibility(boolean)
+     */
     private void closePanelInEast() {
         if (mainPanel.getLayout() instanceof BorderLayout) {
             BorderLayout layout = (BorderLayout) mainPanel.getLayout();
@@ -705,10 +792,39 @@ public class ImageFunction {
             }
             Visible.setVisible(panelNorth.loadImage.saveButton,panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
         }
+        panelVisibility(true);
     }
 
-    private int clampToByte(int value) {
-        return Math.min(255, Math.max(0, value));
+    /**
+     * Creates a transformation button with appropriate text and action listener.
+     * Maps transformation types to user-friendly button labels with symbols.
+     * @param transformation the transformation type for the button
+     * @return configured JButton with transformation action
+     * @see #transform(TransformationType)
+     */
+    private JButton createTransformationButton(TransformationType transformation) {
+        String text;
+        switch (transformation) {
+            case ROTATE_CLOCKWISE:
+                text = "↷ Right";
+                break;
+            case ROTATE_COUNTERCLOCKWISE:
+                text = "↶ Left";
+                break;
+            case FLIP_HORIZONTAL:
+                text = "↕ Horizontal";
+                break;
+            case FLIP_VERTICAL:
+                text = "↔ Vertical";
+                break;
+            default:
+                text = transformation.toString();
+        }
+
+        JButton button = new JButton(text);
+        button.addActionListener(e -> transform(transformation));
+        return button;
     }
+
 
 }

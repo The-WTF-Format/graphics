@@ -8,7 +8,7 @@ import utils.Colors;
  * to draw the (wtf) image correctly
  */
 public class ImagePanel extends JPanel {
-    Image image;
+    public Image image;
     public ImagePanel(Image image) {
         this.image= image;
         this.setBackground(Colors.BACKGROUND);

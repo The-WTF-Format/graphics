@@ -7,21 +7,21 @@ import panel.CreatePanel;
 import utils.Colors;
 import utils.Size;
 
-//ähnlich aufgebaut wie Image.image.CreateNewImage.LoadImage
-//Hier wird ein neues Panel mit einer editorview.MenuBar darin erstellt, in der editorview.MenuBar sind 4 Gruppen und jeweiligen Untergruppen, die die Funktion des Editors beschreiben
+/**
+ * creats a new menubar for the image editing function
+ * it groups the function together in animation, color, general and format
+ * each item is linked to its action via an actionrouter
+ */
 
 public class FunctionMenu {
     JMenuBar menu;
     static CreatePanel mainPanel;
     static PanelNorth panelNorth;
-    //TODO: HInweis:
-    //Um die verschiedenen Menus auf Invisible zu stellen benötigen wir globale Variablen, alternativ können mir auch ein JMenu Array erstellen, wenn dir das lieber ist
     public JMenu animationMenu;
     public JMenu colorMenu;
     public JMenu generalMenu;
     public JMenu converterMenu;
 
-    //Konstruktor
     FunctionMenu(JMenuBar menu, CreatePanel mainPanel, PanelNorth panelNorth) {
         this.menu = menu;
         this.mainPanel = mainPanel;
@@ -29,8 +29,9 @@ public class FunctionMenu {
         addMenus();
        }
 
-    // GENERAL //
-    //addMenus - hier kann die Reihenfolge noch geändert werden
+    /**
+     * Adds all top-level menus in order
+     */
     void addMenus() {
         addAnimationMenu();
         addColorMenu();
@@ -38,10 +39,13 @@ public class FunctionMenu {
         addConverter();
     }
 
-    // MENUS //
-    //einzelne Menus werden erstellt - erstellen der Button und DropDowns sind in Methoden ausgelagert worden
+    /**
+     * Menus
+     */
 
-    //Animation
+    /**
+     * Creates the "Animation" menu with its related functions.
+     */
     private void addAnimationMenu() {
         animationMenu = new JMenu("Animation");
         animationMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
@@ -53,7 +57,9 @@ public class FunctionMenu {
         menu.add(animationMenu);
     }
 
-    //Color
+    /**
+     * Creates the "Color" menu with color manipulation options.
+     */
     private void addColorMenu() {
         colorMenu = new JMenu("Color");
         colorMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
@@ -70,7 +76,9 @@ public class FunctionMenu {
         menu.add(colorMenu);
     }
 
-    //General
+    /**
+     * Creates the "General" menu with its related functions.
+     */
     private void addGeneral() {
         generalMenu = new JMenu("General");
         generalMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
@@ -78,26 +86,17 @@ public class FunctionMenu {
         generalMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
 
         addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Height and width");
-        // Code probieren obs klappt
-        /*JMenuItem height = addMenuItem(generalMenu, "Höhe und Größe ändern");
-        height.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeWTFImageHeight();
-                repaintImage();
-            }
-        });*/
         addMenuItem(generalMenu, ActionRouter.createFunctionMenuActionRouter(this), "Mirror...");
         addMenuItem(generalMenu,  ActionRouter.createFunctionMenuActionRouter(this), "Rotate...");
 
         menu.add(generalMenu);
     }
 
-    //Converter
+    /**
+     * Creates the "Format" menu for image format conversion.
+     */
     private void addConverter() {
         converterMenu = new JMenu("Format");
-        // todo change one "General" to another String - this one could be called "format"
-        //done
         converterMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         converterMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
@@ -107,11 +106,16 @@ public class FunctionMenu {
         menu.add(converterMenu);
     }
 
-    //ActionRouter, der die Funktionen zu den Buttons zuweist
+    /**
+     * Internal helper class to assign actions to menu items using a BiConsumer.
+     */
     public static class ActionRouter {
-        //BiConsumer nimmt zwei Elemente entgegen und gibt keinen Rückgabe wert
-        //das Menüelement, was ausgewählt wird
-        //String, wie die Methode heißt
+        /**
+         * Creates an action router that assigns actions to each menu item.
+         *
+         * @param functionMenu The parent FunctionMenu instance
+         * @return BiConsumer assigning JMenuItem actions based on their name
+         */
         public static BiConsumer<JMenuItem, String> createFunctionMenuActionRouter(FunctionMenu functionMenu) {
             ImageFunction imageFunction = new ImageFunction(panelNorth, mainPanel);
             return (item, name) -> {
@@ -131,8 +135,6 @@ public class FunctionMenu {
                             break;
                         case "Height and width":
                             imageFunction.setEditableHeightWidth();
-//                            imageFunction.changeWTFImageHeight(10);
-//                            imageFunction.changeWTFImageWidth(10);
                             break;
                         case "Rotate...":
                             imageFunction.rotateEditable();
@@ -159,37 +161,31 @@ public class FunctionMenu {
                             imageFunction.converter("PNG");
                             break;
                         default:
-                            System.out.println("Unbekannte Aktion: " + name);
+                            System.out.println("Unknown Function: " + name);
                     }
                 });
             };
         }
     }
 
-    // PRIVAT FUNCTION//
-    //Hauptgruppe erstellen
+    /**
+     * Privat Functions
+     */
+
+    /**
+     * Adds a menu item to the given menu as assigns it an action
+     * @param menu
+     * @param actionAssigner
+     * @param text
+     * @return
+     */
     private JMenuItem addMenuItem(JMenu menu, BiConsumer<JMenuItem, String> actionAssigner, String text) {
         JMenuItem item = new JMenuItem(text);
-        //todo möglichkeit von erstellen einer MenuStyler - verschiedene Gruppen mit verschiedenen Aussehen?
         item.setBackground(Colors.ITEMSSECONDARY);
         menu.add(item);
         //Action werden zugewiesen
         actionAssigner.accept(item, text);
         return item;
-    }
-
-    //Submenu erstellen
-    private JMenu createSubMenu(String name, BiConsumer<JMenuItem, String> actionAssigner, String... items) {
-        JMenu subMenu = new JMenu(name);
-        for (String itemName : items) {
-            JMenuItem item = new JMenuItem(itemName);
-            item.setBackground(Colors.ITEMSSECONDARY);
-            //todo möglichkeit von erstellen einer MenuStyler - verschiedene Gruppen mit verschiedenen Aussehen?
-            subMenu.add(item);
-            //Action werden zugewiesen
-            actionAssigner.accept(item, itemName);
-        }
-        return subMenu;
     }
 
 }

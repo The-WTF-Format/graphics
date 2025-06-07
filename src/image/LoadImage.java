@@ -325,7 +325,12 @@ public class LoadImage {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                doSaveImage(null, "WTF");
+                if(Objects.equals(standardFormat, "jpeg") || Objects.equals(standardFormat, "png")) {
+                    doSaveImage(image, standardFormat);
+                } else {
+                    doSaveImage(null, standardFormat);
+                }
+
                 panel.remove(imagePanel);
                 Visible.setInvisible(saveButton);
                 if(wtfImage != null && wtfImage.animationInformation().isAnimated()) {
