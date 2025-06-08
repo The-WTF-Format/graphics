@@ -45,7 +45,7 @@ public class ImageFunction {
         this.loadimage = panelNorth.loadImage;
 
         if (panelNorth == null || panelNorth.loadImage == null) {
-            System.out.println("no imagepanel loaded!");
+            //System.out.println("no imagepanel loaded!");
         }
         if (panelNorth != null) {
             if (panelNorth.loadImage != null) {
@@ -53,7 +53,7 @@ public class ImageFunction {
             }
         }
         if (editable == null) {
-            System.out.println("no image panel is loaded!");
+            //System.out.println("no image panel is loaded!");
         }
     }
 
@@ -238,6 +238,11 @@ public class ImageFunction {
         JButton closePanel = new JButton("close");
         invertThisValue.addActionListener(x -> {
             Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
+            if(panelNorth.loadImage.editViewButton.isEditorVisible()) {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.viewer, panelNorth.editorMenuBar);
+            } else {
+                Visible.setVisible(panelNorth.loadImage.editViewButton.editor);
+            }
             mainPanel.remove(colorPickerPanel);
             mainPanel.revalidate();
             mainPanel.repaint();
@@ -357,9 +362,9 @@ public class ImageFunction {
         closeButton.addActionListener( x -> {
             Visible.setVisible(panelNorth.loadImage.saveButton, panelNorth.loadImage.loadImage);
             if(panelNorth.loadImage.editViewButton.isEditorVisible()) {
-                Visible.setVisible(panelNorth.loadImage.editViewButton.editor, panelNorth.editorMenuBar);
+                Visible.setVisible(panelNorth.loadImage.editViewButton.viewer, panelNorth.editorMenuBar);
             } else {
-                Visible.setVisible(panelNorth.loadImage.editViewButton.viewer);
+                Visible.setVisible(panelNorth.loadImage.editViewButton.editor);
             }
             mainPanel.remove(invert);
             mainPanel.revalidate();
@@ -382,17 +387,15 @@ public class ImageFunction {
         if (panelNorth.loadImage.editableWtfImage == null) {
             panelNorth.loadImage.editableWtfImage = panelNorth.loadImage.wtfImage.edit();
         }
-        //Frame nehmen
         EditableFrame frame = panelNorth.loadImage.editableWtfImage;
-        //ColorSpace nehmen
+
         ColorSpace cs = frame.at(1, 1).colorSpace();
 
-        //als Java Image ausgeben damit es für Konvertierung alle Kriteren erfüllt(ColorSpace)
         Image WTFimage = panelNorth.loadImage.editableWtfImage.asJavaImage();
         int width = panelNorth.loadImage.editableWtfImage.width();
         int height = panelNorth.loadImage.editableWtfImage.height();
 
-        //Abfrage ob Alpha Kanal vorhanden ist
+        //Alpha Channel
         boolean hasAlpha = false;
         for (ColorChannel channel : cs.channels()) {
             if (channel == ColorSpaceChannels.FIXED_ALPHA || channel == ColorSpaceChannels.DYNAMIC_ALPHA) {
@@ -401,16 +404,16 @@ public class ImageFunction {
             }
         }
 
-        //JPEG unterstützt keine Transparenz!
+        //transparent does not work for JPEG
         int imageType;
         if (extension.equalsIgnoreCase("JPEG")) {
-            imageType = BufferedImage.TYPE_INT_RGB; // kein Alpha für JPEG!
+            imageType = BufferedImage.TYPE_INT_RGB; //
         } else {
             imageType = hasAlpha ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
         }
         BufferedImage bufferedImage = new BufferedImage(width, height, imageType);
 
-        //Image als BufferedImage nachzeichnen
+        //draw Image as BufferedImage
         Graphics2D g2d = bufferedImage.createGraphics();
         g2d.drawImage(WTFimage, 0, 0, null);
         g2d.dispose();

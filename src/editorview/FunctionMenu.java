@@ -65,7 +65,7 @@ public class FunctionMenu {
         colorMenu.setPreferredSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMinimumSize(Size.BUTTONSIZEMAINMENU);
         colorMenu.setMaximumSize(Size.BUTTONSIZEMAINMENU);
-        //z.B.
+        //for example
         /*colorMenu.add(createSubMenu("Color Picker", ActionRouter.createFunctionMenuActionRouter(this),"Farbname & Hexadezimalcode"));
         colorMenu.add(createSubMenu("Invert Color", ActionRouter.createFunctionMenuActionRouter(this),"Komplementärfarbe"));
         colorMenu.add(createSubMenu("Color Space", ActionRouter.createFunctionMenuActionRouter(this),"Select color space"));
@@ -183,7 +183,6 @@ public class FunctionMenu {
         JMenuItem item = new JMenuItem(text);
         item.setBackground(Colors.ITEMSSECONDARY);
         menu.add(item);
-        //Action werden zugewiesen
         actionAssigner.accept(item, text);
         return item;
     }

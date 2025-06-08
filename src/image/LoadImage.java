@@ -152,7 +152,7 @@ public class LoadImage {
                          * the user decide to cancel this operation, because there is already a loaded image
                          */
                     }
-                    if(wtfImage.animationInformation().isAnimated()) {
+                    if(wtfImage != null && wtfImage.animationInformation().isAnimated()) {
                         Visible.setVisible(editViewButton.panelNorth.editorMenu.functionMenuEditor.colorMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.generalMenu,
                                 editViewButton.panelNorth.editorMenu.functionMenuEditor.converterMenu);
@@ -325,7 +325,7 @@ public class LoadImage {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(Objects.equals(standardFormat, "jpeg") || Objects.equals(standardFormat, "png")) {
+                if(Objects.equals(standardFormat, "jpg") || Objects.equals(standardFormat, "jpeg") || Objects.equals(standardFormat, "png")) {
                     doSaveImage(image, standardFormat);
                 } else {
                     doSaveImage(null, standardFormat);
@@ -545,7 +545,7 @@ public class LoadImage {
                 System.out.println("No WTF image to save.");
             }
 
-        } else if (extension.equals("jpeg") || extension.equals("png")) {
+        } else if (extension.equals("jpeg") || extension.equals("png") || extension.equals("jpg")) {
             if (image != null) {
                 Path path = getSavingPath(false);
                 String pathStr = path.toString();
