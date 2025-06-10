@@ -503,12 +503,12 @@ public class ImageFunction {
                     int newY, newX;
 
                     switch (type) {
-                        case ROTATE_CLOCKWISE:
+                        case ROTATE_COUNTERCLOCKWISE:
                             newY = x;
                             newX = height - 1 - y;
                             break;
 
-                        case ROTATE_COUNTERCLOCKWISE:
+                        case ROTATE_CLOCKWISE:
                             newY = width - 1 - x;
                             newX = y;
                             break;
@@ -815,10 +815,10 @@ public class ImageFunction {
                 text = "↶ Left";
                 break;
             case FLIP_HORIZONTAL:
-                text = "↕ Horizontal";
+                text = "↔ Horizontal";
                 break;
             case FLIP_VERTICAL:
-                text = "↔ Vertical";
+                text = "↕ Vertical";
                 break;
             default:
                 text = transformation.toString();
